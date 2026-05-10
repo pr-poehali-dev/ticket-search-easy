@@ -3,6 +3,7 @@ import Icon from "@/components/ui/icon";
 
 const NEWS_API = "https://functions.poehali.dev/4646c7cb-dd1b-424c-ab23-10d543cfc8c4";
 const WEATHER_API = "https://functions.poehali.dev/f1cb531b-1e57-49a1-a494-e158a960aa31";
+const AIRPORT_STATUS_API = "https://functions.poehali.dev/d59d455f-da30-4c36-b8cc-878db1ba737a";
 
 type NewsItem = {
   tag: string;
@@ -18,6 +19,15 @@ type WeatherSpot = {
   temp: string;
   cond: string;
   icon: string;
+};
+
+type AirportAlert = {
+  status: "restriction" | "resume";
+  airports: string[];
+  title: string;
+  text: string;
+  date: string;
+  source: string;
 };
 
 const fallbackNews: NewsItem[] = [
@@ -80,9 +90,27 @@ export default function Home() {
   const [newsLoading, setNewsLoading] = useState(true);
   const [weather, setWeather] = useState<WeatherSpot[]>(fallbackWeather);
   const [weatherLoading, setWeatherLoading] = useState(true);
+  const [alerts, setAlerts] = useState<AirportAlert[]>([]);
+  const [alertsLoading, setAlertsLoading] = useState(true);
 
   useEffect(() => {
     let cancelled = false;
+
+    const loadAlerts = () => {
+      fetch(AIRPORT_STATUS_API)
+        .then((r) => r.json())
+        .then((data) => {
+          if (cancelled) return;
+          if (Array.isArray(data?.alerts)) setAlerts(data.alerts);
+        })
+        .catch(() => {})
+        .finally(() => {
+          if (!cancelled) setAlertsLoading(false);
+        });
+    };
+    loadAlerts();
+    // Обновляем статусы аэропортов каждые 2 минуты
+    const alertsTimer = setInterval(loadAlerts, 120000);
     fetch(NEWS_API)
       .then((r) => r.json())
       .then((data) => {
@@ -111,6 +139,7 @@ export default function Home() {
 
     return () => {
       cancelled = true;
+      clearInterval(alertsTimer);
     };
   }, []);
 
@@ -160,7 +189,7 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-[#e5e5e3]">
-      <section className="px-6 pt-20 pb-16 max-w-4xl mx-auto animate-slide-up">
+      <section className="px-6 pt-20 pb-10 max-w-4xl mx-auto animate-slide-up">
         <h1 className="text-5xl font-semibold text-[#111] leading-tight mb-2">
           Летите туда,
           <br />
@@ -170,6 +199,109 @@ export default function Home() {
           Сравниваем цены сотен авиакомпаний — мгновенно.
         </p>
       </section>
+
+      {/* Airport alerts */}
+      {(alerts.length > 0 || alertsLoading) && (
+        <section className="px-6 pb-8 max-w-4xl mx-auto">
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-2">
+              <Icon name="TriangleAlert" size={16} className="text-[#c97a2b]" />
+              <h2 className="text-sm font-medium tracking-[0.15em] uppercase text-[#8a8a8a] font-['IBM_Plex_Mono']">
+                Статус аэропортов России
+              </h2>
+            </div>
+            <span className="text-[10px] text-[#c0c0bc] font-['IBM_Plex_Mono'] flex items-center gap-1.5">
+              <span
+                className={`w-1.5 h-1.5 rounded-full ${
+                  alertsLoading ? "bg-[#c0c0bc] animate-pulse" : "bg-[#7B9D52]"
+                }`}
+              />
+              {alertsLoading ? "ПРОВЕРЯЕМ…" : "ОБНОВЛЯЕТСЯ"}
+            </span>
+          </div>
+
+          {alertsLoading && alerts.length === 0 ? (
+            <div className="bg-white border border-[#e8e8e6] rounded-2xl p-5 animate-pulse">
+              <div className="h-3 bg-[#ececea] rounded w-2/3 mb-3" />
+              <div className="h-3 bg-[#ececea] rounded w-1/2" />
+            </div>
+          ) : alerts.length === 0 ? (
+            <div className="bg-white border border-[#e8e8e6] rounded-2xl p-5 flex items-center gap-3">
+              <div className="w-8 h-8 rounded-full bg-[#7B9D52]/10 flex items-center justify-center">
+                <Icon name="Check" size={16} className="text-[#7B9D52]" />
+              </div>
+              <p className="text-sm text-[#111]">
+                Сейчас нет действующих ограничений — все аэропорты работают штатно.
+              </p>
+            </div>
+          ) : (
+            <div className="space-y-2">
+              {alerts.slice(0, 4).map((a, idx) => {
+                const isResume = a.status === "resume";
+                return (
+                  <a
+                    key={idx}
+                    href={a.source}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={`block bg-white border rounded-2xl p-4 hover:border-[#111] transition-all ${
+                      isResume ? "border-[#7B9D52]/30" : "border-[#c97a2b]/30"
+                    }`}
+                  >
+                    <div className="flex items-start gap-3">
+                      <div
+                        className={`shrink-0 w-9 h-9 rounded-xl flex items-center justify-center ${
+                          isResume ? "bg-[#7B9D52]/10" : "bg-[#c97a2b]/10"
+                        }`}
+                      >
+                        <Icon
+                          name={isResume ? "CircleCheck" : "TriangleAlert"}
+                          size={18}
+                          className={isResume ? "text-[#7B9D52]" : "text-[#c97a2b]"}
+                        />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 flex-wrap mb-1">
+                          <span
+                            className={`text-[10px] tracking-[0.15em] font-['IBM_Plex_Mono'] px-2 py-0.5 rounded ${
+                              isResume
+                                ? "text-[#7B9D52] bg-[#7B9D52]/10"
+                                : "text-[#c97a2b] bg-[#c97a2b]/10"
+                            }`}
+                          >
+                            {a.title.toUpperCase()}
+                          </span>
+                          {a.airports.slice(0, 3).map((ap) => (
+                            <span
+                              key={ap}
+                              className="text-[11px] font-medium text-[#111] bg-[#f3f3f1] px-2 py-0.5 rounded"
+                            >
+                              {ap}
+                            </span>
+                          ))}
+                          {a.airports.length > 3 && (
+                            <span className="text-[11px] text-[#8a8a8a]">
+                              +{a.airports.length - 3}
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-sm text-[#444] leading-snug">
+                          {a.text}
+                        </p>
+                        {a.date && (
+                          <p className="text-[10px] text-[#c0c0bc] font-['IBM_Plex_Mono'] mt-2">
+                            {a.date} МСК
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  </a>
+                );
+              })}
+            </div>
+          )}
+        </section>
+      )}
 
       <section className="px-6 pb-8 max-w-4xl mx-auto">
         {!widgetReady && (
