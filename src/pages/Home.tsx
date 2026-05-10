@@ -12,23 +12,28 @@ const popularRoutes = [
 
 export default function Home() {
   useEffect(() => {
-    // Переинициализируем виджет при каждом возврате на страницу
-    const w = window as Window & { TPWL?: { init?: () => void }; tpwl?: { init?: () => void } };
-    if (typeof w.TPWL !== "undefined" && typeof w.TPWL.init === "function") {
-      w.TPWL.init();
-    } else if (typeof w.tpwl !== "undefined" && typeof w.tpwl.init === "function") {
-      w.tpwl.init();
-    } else {
-      // Виджет ещё не загружен — ждём и пробуем снова
-      const timer = setTimeout(() => {
-        if (typeof w.TPWL !== "undefined" && typeof w.TPWL.init === "function") {
-          w.TPWL.init();
-        } else if (typeof w.tpwl !== "undefined" && typeof w.tpwl.init === "function") {
-          w.tpwl.init();
-        }
-      }, 500);
-      return () => clearTimeout(timer);
-    }
+    const WIDGET_SRC = "https://tpemd.com/wl_web/main.js?wl_id=17282";
+
+    // Удаляем старый скрипт виджета
+    const old = document.querySelector(`script[src="${WIDGET_SRC}"]`);
+    if (old) old.remove();
+
+    // Очищаем контейнеры
+    const search = document.getElementById("tpwl-search");
+    const tickets = document.getElementById("tpwl-tickets");
+    if (search) search.innerHTML = "";
+    if (tickets) tickets.innerHTML = "";
+
+    // Вставляем скрипт заново — виджет инициализируется сам
+    const script = document.createElement("script");
+    script.src = WIDGET_SRC;
+    script.async = true;
+    script.type = "module";
+    document.head.appendChild(script);
+
+    return () => {
+      script.remove();
+    };
   }, []);
 
   return (
