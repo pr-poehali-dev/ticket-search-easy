@@ -1,4 +1,5 @@
 {
+  "weather": "https://functions.poehali.dev/f1cb531b-1e57-49a1-a494-e158a960aa31",
   "travel-news": "https://functions.poehali.dev/4646c7cb-dd1b-424c-ab23-10d543cfc8c4",
   "profile": "https://functions.poehali.dev/5bf4e383-9065-431d-94a7-b2de63c5e1cd",
   "auth": "https://functions.poehali.dev/9424784b-313d-4253-8027-0018619e33f2",

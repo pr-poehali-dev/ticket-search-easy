@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import Icon from "@/components/ui/icon";
 
 const NEWS_API = "https://functions.poehali.dev/4646c7cb-dd1b-424c-ab23-10d543cfc8c4";
+const WEATHER_API = "https://functions.poehali.dev/f1cb531b-1e57-49a1-a494-e158a960aa31";
 
 type NewsItem = {
   tag: string;
@@ -10,6 +11,13 @@ type NewsItem = {
   desc: string;
   icon: string;
   link?: string;
+};
+
+type WeatherSpot = {
+  city: string;
+  temp: string;
+  cond: string;
+  icon: string;
 };
 
 const fallbackNews: NewsItem[] = [
@@ -59,17 +67,19 @@ const travelTips = [
   },
 ];
 
-const weatherSpots = [
-  { city: "Дубай", temp: "+34°", cond: "Солнечно", icon: "Sun" },
-  { city: "Стамбул", temp: "+22°", cond: "Малооблачно", icon: "CloudSun" },
-  { city: "Пхукет", temp: "+31°", cond: "Дожди", icon: "CloudRain" },
-  { city: "Сочи", temp: "+19°", cond: "Облачно", icon: "Cloud" },
+const fallbackWeather: WeatherSpot[] = [
+  { city: "Дубай", temp: "—", cond: "Загружаем…", icon: "Cloud" },
+  { city: "Стамбул", temp: "—", cond: "Загружаем…", icon: "Cloud" },
+  { city: "Пхукет", temp: "—", cond: "Загружаем…", icon: "Cloud" },
+  { city: "Сочи", temp: "—", cond: "Загружаем…", icon: "Cloud" },
 ];
 
 export default function Home() {
   const [widgetReady, setWidgetReady] = useState(false);
   const [news, setNews] = useState<NewsItem[]>(fallbackNews);
   const [newsLoading, setNewsLoading] = useState(true);
+  const [weather, setWeather] = useState<WeatherSpot[]>(fallbackWeather);
+  const [weatherLoading, setWeatherLoading] = useState(true);
 
   useEffect(() => {
     let cancelled = false;
@@ -85,6 +95,20 @@ export default function Home() {
       .finally(() => {
         if (!cancelled) setNewsLoading(false);
       });
+
+    fetch(WEATHER_API)
+      .then((r) => r.json())
+      .then((data) => {
+        if (cancelled) return;
+        if (Array.isArray(data?.spots) && data.spots.length > 0) {
+          setWeather(data.spots);
+        }
+      })
+      .catch(() => {})
+      .finally(() => {
+        if (!cancelled) setWeatherLoading(false);
+      });
+
     return () => {
       cancelled = true;
     };
@@ -236,11 +260,26 @@ export default function Home() {
 
       {/* Weather */}
       <section className="px-6 pb-12 max-w-4xl mx-auto">
-        <h2 className="text-sm font-medium tracking-[0.15em] uppercase text-[#8a8a8a] mb-6 font-['IBM_Plex_Mono']">
-          Погода в популярных направлениях
-        </h2>
+        <div className="flex items-end justify-between mb-6">
+          <h2 className="text-sm font-medium tracking-[0.15em] uppercase text-[#8a8a8a] font-['IBM_Plex_Mono']">
+            Погода в популярных направлениях
+          </h2>
+          <span className="text-[10px] text-[#c0c0bc] font-['IBM_Plex_Mono'] flex items-center gap-1.5">
+            {weatherLoading ? (
+              <>
+                <span className="w-1.5 h-1.5 rounded-full bg-[#c0c0bc] animate-pulse" />
+                ОБНОВЛЯЕМ…
+              </>
+            ) : (
+              <>
+                <span className="w-1.5 h-1.5 rounded-full bg-[#7B9D52]" />
+                СЕЙЧАС
+              </>
+            )}
+          </span>
+        </div>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-          {weatherSpots.map((w) => (
+          {weather.map((w) => (
             <div
               key={w.city}
               className="bg-white border border-[#e8e8e6] rounded-2xl p-5 flex flex-col items-start"
