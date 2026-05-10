@@ -9,6 +9,15 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+    <!-- Прогрев соединений и предзагрузка виджета поиска -->
+    <link rel="preconnect" href="https://tpemd.com" crossorigin>
+    <link rel="preconnect" href="https://api.apistp.com" crossorigin>
+    <link rel="preconnect" href="https://www.apistp.com" crossorigin>
+    <link rel="dns-prefetch" href="https://tpemd.com">
+    <link rel="dns-prefetch" href="https://api.apistp.com">
+    <link rel="dns-prefetch" href="https://www.apistp.com">
+    <link rel="modulepreload" href="https://tpemd.com/wl_web/main.js?wl_id=17282" crossorigin>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <meta property="og:title" content="Компас | Билеты и отели">
     <meta property="og:description" content="Поиск дешёвых авиабилетов по всему миру. Сравнивайте цены, сохраняйте маршруты и получайте уведомления о снижении цен.">
@@ -29,16 +38,8 @@
     <meta name="pp-name" value="ticket-search-easy">
       <script src="https://cdn.poehali.dev/intertnal/js/inspector-min.js"></script>
 
-    <!-- Partner search widget -->
-    <script nowprocket data-noptimize="1" data-cfasync="false" data-wpfc-render="false" seraph-accel-crit="1" data-no-defer="1">
-      (function () {
-        var script = document.createElement("script");
-        script.async = 1;
-        script.type = "module";
-        script.src = "https://tpemd.com/wl_web/main.js?wl_id=17282";
-        document.head.appendChild(script);
-      })();
-    </script>
+    <!-- Partner search widget — прямой тег для максимально ранней загрузки -->
+    <script type="module" async src="https://tpemd.com/wl_web/main.js?wl_id=17282"></script>
   </head>
 
 <body>
