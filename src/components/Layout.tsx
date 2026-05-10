@@ -23,14 +23,13 @@ export default function Layout({ page, onNav, children }: LayoutProps) {
         <div className="max-w-4xl mx-auto px-6 h-16 flex items-center justify-between">
           <button
             onClick={() => onNav("home")}
-            className="flex items-center gap-2.5 group"
+            className="flex items-center"
           >
-            <div className="w-8 h-8 bg-[#111] rounded-lg flex items-center justify-center">
-              <Icon name="Plane" size={14} className="text-white" />
-            </div>
-            <span className="font-semibold text-[#111] text-base tracking-tight">
-              Авиа<span className="font-normal text-[#8a8a8a]">билеты</span>
-            </span>
+            <img
+              src="https://cdn.poehali.dev/projects/deb6d332-2cc4-4c3a-bcd1-e4e0a738361b/bucket/f0381683-417d-42a0-98e9-148201492b78.png"
+              alt="КОМПАС"
+              className="h-9 w-auto"
+            />
           </button>
 
           <nav className="hidden sm:flex items-center gap-1">
@@ -75,7 +74,14 @@ export default function Layout({ page, onNav, children }: LayoutProps) {
       {/* Footer */}
       <footer className="hidden sm:block border-t border-[#e8e8e6] bg-white">
         <div className="max-w-4xl mx-auto px-6 py-6 flex items-center justify-between">
-          <p className="text-xs text-[#c0c0bc] font-['IBM_Plex_Mono']">© 2025 Авиабилеты</p>
+          <div className="flex items-center gap-3">
+            <img
+              src="https://cdn.poehali.dev/projects/deb6d332-2cc4-4c3a-bcd1-e4e0a738361b/bucket/f0381683-417d-42a0-98e9-148201492b78.png"
+              alt="КОМПАС"
+              className="h-6 w-auto opacity-30"
+            />
+            <span className="text-xs text-[#c0c0bc] font-['IBM_Plex_Mono']">© 2025</span>
+          </div>
           <div className="flex gap-6">
             {["Пользовательское соглашение", "Политика конфиденциальности"].map((t) => (
               <button key={t} className="text-xs text-[#c0c0bc] hover:text-[#8a8a8a] transition-colors">
