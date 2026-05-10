@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import Icon from "@/components/ui/icon";
 
 const popularRoutes = [
@@ -10,6 +11,26 @@ const popularRoutes = [
 ];
 
 export default function Home() {
+  useEffect(() => {
+    // Переинициализируем виджет при каждом возврате на страницу
+    const w = window as Window & { TPWL?: { init?: () => void }; tpwl?: { init?: () => void } };
+    if (typeof w.TPWL !== "undefined" && typeof w.TPWL.init === "function") {
+      w.TPWL.init();
+    } else if (typeof w.tpwl !== "undefined" && typeof w.tpwl.init === "function") {
+      w.tpwl.init();
+    } else {
+      // Виджет ещё не загружен — ждём и пробуем снова
+      const timer = setTimeout(() => {
+        if (typeof w.TPWL !== "undefined" && typeof w.TPWL.init === "function") {
+          w.TPWL.init();
+        } else if (typeof w.tpwl !== "undefined" && typeof w.tpwl.init === "function") {
+          w.tpwl.init();
+        }
+      }, 500);
+      return () => clearTimeout(timer);
+    }
+  }, []);
+
   return (
     <div className="min-h-screen bg-[#e5e5e3]">
       {/* Hero */}
