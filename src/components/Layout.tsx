@@ -39,7 +39,7 @@ export default function Layout({ page, onNav, children }: LayoutProps) {
                 onClick={() => onNav(item.key)}
                 className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                   page === item.key
-                    ? "bg-[#f2f2f0] text-[#111]"
+                    ? "bg-[#7B9D52]/10 text-[#7B9D52]"
                     : "text-[#8a8a8a] hover:text-[#111] hover:bg-[#f7f7f6]"
                 }`}
               >
@@ -61,7 +61,7 @@ export default function Layout({ page, onNav, children }: LayoutProps) {
               key={item.key}
               onClick={() => onNav(item.key)}
               className={`flex-1 flex flex-col items-center gap-1 py-3 transition-colors ${
-                page === item.key ? "text-[#111]" : "text-[#c0c0bc]"
+                page === item.key ? "text-[#7B9D52]" : "text-[#c0c0bc]"
               }`}
             >
               <Icon name={item.icon} size={18} />
