@@ -28,8 +28,13 @@ export default function Home() {
       </section>
 
       {/* Partner Search Widget */}
-      <section className="px-6 pb-16 max-w-4xl mx-auto">
+      <section className="px-6 pb-8 max-w-4xl mx-auto">
         <div id="tpwl-search"></div>
+      </section>
+
+      {/* Partner Search Results */}
+      <section className="px-6 pb-16 max-w-4xl mx-auto">
+        <div id="tpwl-tickets"></div>
       </section>
 
       {/* Popular Routes */}
