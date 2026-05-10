@@ -1,4 +1,3 @@
-import { useState } from "react";
 import Icon from "@/components/ui/icon";
 
 const popularRoutes = [
@@ -11,19 +10,6 @@ const popularRoutes = [
 ];
 
 export default function Home() {
-  const [tripType, setTripType] = useState<"roundtrip" | "oneway">("roundtrip");
-  const [from, setFrom] = useState("");
-  const [to, setTo] = useState("");
-  const [dateFrom, setDateFrom] = useState("");
-  const [dateTo, setDateTo] = useState("");
-  const [passengers, setPassengers] = useState(1);
-
-  const swap = () => {
-    const temp = from;
-    setFrom(to);
-    setTo(temp);
-  };
-
   return (
     <div className="min-h-screen bg-[#f7f7f6]">
       {/* Hero */}
@@ -41,124 +27,9 @@ export default function Home() {
         </p>
       </section>
 
-      {/* Search Form */}
+      {/* Partner Search Widget */}
       <section className="px-6 pb-16 max-w-4xl mx-auto">
-        <div className="bg-white rounded-2xl border border-[#e8e8e6] shadow-sm p-6 animate-fade-in">
-          {/* Trip type toggle */}
-          <div className="flex gap-1 mb-6 bg-[#f2f2f0] rounded-xl p-1 w-fit">
-            <button
-              onClick={() => setTripType("roundtrip")}
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                tripType === "roundtrip"
-                  ? "bg-white text-[#111] shadow-sm"
-                  : "text-[#8a8a8a] hover:text-[#111]"
-              }`}
-            >
-              Туда-обратно
-            </button>
-            <button
-              onClick={() => setTripType("oneway")}
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                tripType === "oneway"
-                  ? "bg-white text-[#111] shadow-sm"
-                  : "text-[#8a8a8a] hover:text-[#111]"
-              }`}
-            >
-              В одну сторону
-            </button>
-          </div>
-
-          {/* Route row */}
-          <div className="flex items-center gap-2 mb-3">
-            <div className="flex-1">
-              <label className="text-xs text-[#8a8a8a] mb-1.5 block font-medium uppercase tracking-wider font-['IBM_Plex_Mono']">
-                Откуда
-              </label>
-              <input
-                type="text"
-                value={from}
-                onChange={(e) => setFrom(e.target.value)}
-                placeholder="Город или аэропорт"
-                className="w-full border border-[#e8e8e6] rounded-xl px-4 py-3 text-[#111] placeholder:text-[#c0c0bc] focus:outline-none focus:border-[#111] transition-colors text-sm"
-              />
-            </div>
-
-            <button
-              onClick={swap}
-              className="mt-6 w-10 h-10 flex items-center justify-center rounded-full border border-[#e8e8e6] bg-white hover:bg-[#f2f2f0] transition-colors flex-shrink-0"
-            >
-              <Icon name="ArrowLeftRight" size={14} />
-            </button>
-
-            <div className="flex-1">
-              <label className="text-xs text-[#8a8a8a] mb-1.5 block font-medium uppercase tracking-wider font-['IBM_Plex_Mono']">
-                Куда
-              </label>
-              <input
-                type="text"
-                value={to}
-                onChange={(e) => setTo(e.target.value)}
-                placeholder="Город или аэропорт"
-                className="w-full border border-[#e8e8e6] rounded-xl px-4 py-3 text-[#111] placeholder:text-[#c0c0bc] focus:outline-none focus:border-[#111] transition-colors text-sm"
-              />
-            </div>
-          </div>
-
-          {/* Dates + passengers row */}
-          <div className="flex gap-3 mb-5">
-            <div className="flex-1">
-              <label className="text-xs text-[#8a8a8a] mb-1.5 block font-medium uppercase tracking-wider font-['IBM_Plex_Mono']">
-                Туда
-              </label>
-              <input
-                type="date"
-                value={dateFrom}
-                onChange={(e) => setDateFrom(e.target.value)}
-                className="w-full border border-[#e8e8e6] rounded-xl px-4 py-3 text-[#111] focus:outline-none focus:border-[#111] transition-colors text-sm"
-              />
-            </div>
-
-            {tripType === "roundtrip" && (
-              <div className="flex-1">
-                <label className="text-xs text-[#8a8a8a] mb-1.5 block font-medium uppercase tracking-wider font-['IBM_Plex_Mono']">
-                  Обратно
-                </label>
-                <input
-                  type="date"
-                  value={dateTo}
-                  onChange={(e) => setDateTo(e.target.value)}
-                  className="w-full border border-[#e8e8e6] rounded-xl px-4 py-3 text-[#111] focus:outline-none focus:border-[#111] transition-colors text-sm"
-                />
-              </div>
-            )}
-
-            <div className="w-36">
-              <label className="text-xs text-[#8a8a8a] mb-1.5 block font-medium uppercase tracking-wider font-['IBM_Plex_Mono']">
-                Пассажиры
-              </label>
-              <div className="flex items-center border border-[#e8e8e6] rounded-xl overflow-hidden">
-                <button
-                  onClick={() => setPassengers(Math.max(1, passengers - 1))}
-                  className="px-3 py-3 hover:bg-[#f2f2f0] transition-colors text-[#111]"
-                >
-                  <Icon name="Minus" size={14} />
-                </button>
-                <span className="flex-1 text-center text-sm font-medium text-[#111]">{passengers}</span>
-                <button
-                  onClick={() => setPassengers(Math.min(9, passengers + 1))}
-                  className="px-3 py-3 hover:bg-[#f2f2f0] transition-colors text-[#111]"
-                >
-                  <Icon name="Plus" size={14} />
-                </button>
-              </div>
-            </div>
-          </div>
-
-          <button className="w-full bg-[#111] text-white py-3.5 rounded-xl font-semibold hover:bg-[#333] transition-colors flex items-center justify-center gap-2 text-sm">
-            <Icon name="Search" size={16} />
-            Найти билеты
-          </button>
-        </div>
+        <div id="tpwl-search"></div>
       </section>
 
       {/* Popular Routes */}
