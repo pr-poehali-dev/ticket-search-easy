@@ -200,9 +200,34 @@ export default function Home() {
         </p>
       </section>
 
+      <section className="px-6 pb-8 max-w-4xl mx-auto">
+        {!widgetReady && (
+          <div className="bg-white border border-[#e8e8e6] rounded-2xl p-8 animate-pulse">
+            <div className="flex items-center gap-3 mb-6">
+              <Icon name="Plane" size={20} className="text-[#c0c0bc]" />
+              <div className="h-3 bg-[#ececea] rounded w-32" />
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
+              <div className="h-12 bg-[#ececea] rounded-xl" />
+              <div className="h-12 bg-[#ececea] rounded-xl" />
+              <div className="h-12 bg-[#ececea] rounded-xl" />
+              <div className="h-12 bg-[#111] rounded-xl opacity-20" />
+            </div>
+            <p className="text-xs text-[#c0c0bc] font-['IBM_Plex_Mono'] mt-5 tracking-wider">
+              ЗАГРУЖАЕМ ПОИСК…
+            </p>
+          </div>
+        )}
+        <div id="tpwl-search" className={widgetReady ? "" : "hidden"}></div>
+      </section>
+
+      <section className="px-6 pb-16 max-w-4xl mx-auto">
+        <div id="tpwl-tickets"></div>
+      </section>
+
       {/* Airport alerts */}
       {(alerts.length > 0 || alertsLoading) && (
-        <section className="px-6 pb-8 max-w-4xl mx-auto">
+        <section className="px-6 pb-12 max-w-4xl mx-auto">
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
               <Icon name="TriangleAlert" size={16} className="text-[#c97a2b]" />
@@ -302,31 +327,6 @@ export default function Home() {
           )}
         </section>
       )}
-
-      <section className="px-6 pb-8 max-w-4xl mx-auto">
-        {!widgetReady && (
-          <div className="bg-white border border-[#e8e8e6] rounded-2xl p-8 animate-pulse">
-            <div className="flex items-center gap-3 mb-6">
-              <Icon name="Plane" size={20} className="text-[#c0c0bc]" />
-              <div className="h-3 bg-[#ececea] rounded w-32" />
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
-              <div className="h-12 bg-[#ececea] rounded-xl" />
-              <div className="h-12 bg-[#ececea] rounded-xl" />
-              <div className="h-12 bg-[#ececea] rounded-xl" />
-              <div className="h-12 bg-[#111] rounded-xl opacity-20" />
-            </div>
-            <p className="text-xs text-[#c0c0bc] font-['IBM_Plex_Mono'] mt-5 tracking-wider">
-              ЗАГРУЖАЕМ ПОИСК…
-            </p>
-          </div>
-        )}
-        <div id="tpwl-search" className={widgetReady ? "" : "hidden"}></div>
-      </section>
-
-      <section className="px-6 pb-16 max-w-4xl mx-auto">
-        <div id="tpwl-tickets"></div>
-      </section>
 
       {/* News */}
       <section className="px-6 pb-12 max-w-4xl mx-auto">
