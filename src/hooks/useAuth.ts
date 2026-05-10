@@ -47,18 +47,33 @@ function clearToken() {
   localStorage.removeItem("kompas_token");
 }
 
+let _globalUser: User | null = null;
+const _listeners = new Set<(u: User | null) => void>();
+
+function setGlobalUser(u: User | null) {
+  _globalUser = u;
+  _listeners.forEach(fn => fn(u));
+}
+
 export function useAuth() {
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState<User | null>(_globalUser);
+  const [loading, setLoading] = useState(_globalUser === null && !!getToken());
 
   useEffect(() => {
+    const syncUser = (u: User | null) => setUser(u);
+    _listeners.add(syncUser);
+    return () => { _listeners.delete(syncUser); };
+  }, []);
+
+  useEffect(() => {
+    if (_globalUser) { setLoading(false); return; }
     const token = getToken();
     if (!token) { setLoading(false); return; }
     fetch(`${AUTH_URL}?action=me`, { headers: { "X-Auth-Token": token } })
       .then(r => r.json())
       .then(data => {
         const parsed = typeof data === "string" ? JSON.parse(data) : data;
-        if (parsed.id) setUser(parsed);
+        if (parsed.id) setGlobalUser(parsed);
         else clearToken();
       })
       .catch(() => clearToken())
@@ -75,7 +90,7 @@ export function useAuth() {
     const data = typeof raw === "string" ? JSON.parse(raw) : raw;
     if (data.token) {
       setToken(data.token);
-      setUser(data.user);
+      setGlobalUser(data.user);
       return { ok: true };
     }
     return { ok: false, error: data.error };
@@ -91,7 +106,7 @@ export function useAuth() {
     const data = typeof raw === "string" ? JSON.parse(raw) : raw;
     if (data.token) {
       setToken(data.token);
-      setUser(data.user);
+      setGlobalUser(data.user);
       return { ok: true };
     }
     return { ok: false, error: data.error };
@@ -99,7 +114,7 @@ export function useAuth() {
 
   function logout() {
     clearToken();
-    setUser(null);
+    setGlobalUser(null);
   }
 
   async function getProfile(): Promise<PassengerProfile | null> {

@@ -10,7 +10,6 @@ type Tab = "profile" | "passport";
 export default function Cabinet() {
   const { user, loading, logout } = useAuth();
   const [tab, setTab] = useState<Tab>("profile");
-  const [refreshKey, setRefreshKey] = useState(0);
 
   if (loading) {
     return (
@@ -23,7 +22,7 @@ export default function Cabinet() {
   if (!user) {
     return (
       <div className="min-h-screen bg-[#e5e5e3]">
-        <CabinetAuthForm onSuccess={() => setRefreshKey(k => k + 1)} />
+        <CabinetAuthForm onSuccess={() => {}} />
       </div>
     );
   }
@@ -31,7 +30,7 @@ export default function Cabinet() {
   const initials = `${user.first_name?.[0] || ""}${user.last_name?.[0] || ""}`.toUpperCase() || user.email[0].toUpperCase();
 
   return (
-    <div key={refreshKey} className="min-h-screen bg-[#e5e5e3]">
+    <div className="min-h-screen bg-[#e5e5e3]">
       <div className="max-w-4xl mx-auto px-6 pt-12 pb-20">
         {/* Header */}
         <div className="mb-8 animate-slide-up flex items-center justify-between">
