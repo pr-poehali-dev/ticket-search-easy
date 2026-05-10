@@ -12,23 +12,29 @@ const popularRoutes = [
 
 export default function Home() {
   useEffect(() => {
-    const WIDGET_SRC = "https://tpemd.com/wl_web/main.js?wl_id=17282";
+    // Удаляем все ранее вставленные скрипты виджета
+    document
+      .querySelectorAll('script[data-tpwl-widget="1"]')
+      .forEach((el) => el.remove());
 
-    // Удаляем старый скрипт виджета
-    const old = document.querySelector(`script[src="${WIDGET_SRC}"]`);
-    if (old) old.remove();
+    // Убираем кэш модуля, если был
+    document
+      .querySelectorAll('script[src*="tpemd.com/wl_web/main.js"]')
+      .forEach((el) => el.remove());
 
-    // Очищаем контейнеры
+    // Очищаем контейнеры от предыдущего рендера
     const search = document.getElementById("tpwl-search");
     const tickets = document.getElementById("tpwl-tickets");
     if (search) search.innerHTML = "";
     if (tickets) tickets.innerHTML = "";
 
-    // Вставляем скрипт заново — виджет инициализируется сам
+    // Cache-buster, чтобы браузер выполнил скрипт заново
+    const bust = Date.now();
     const script = document.createElement("script");
-    script.src = WIDGET_SRC;
+    script.src = `https://tpemd.com/wl_web/main.js?wl_id=17282&_=${bust}`;
     script.async = true;
     script.type = "module";
+    script.setAttribute("data-tpwl-widget", "1");
     document.head.appendChild(script);
 
     return () => {
