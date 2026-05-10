@@ -15,12 +15,21 @@ export default function Layout() {
   const isActive = (path: string) =>
     path === "/" ? location.pathname === "/" : location.pathname.startsWith(path);
 
+  const go = (path: string) => {
+    // На главную — всегда полная перезагрузка, чтобы виджет поиска инициализировался заново
+    if (path === "/") {
+      window.location.href = "/";
+    } else {
+      navigate(path);
+    }
+  };
+
   return (
     <div className="min-h-screen flex flex-col">
       {/* Top nav */}
       <header className="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-[#e8e8e6]">
         <div className="max-w-4xl mx-auto px-6 h-16 flex items-center justify-between">
-          <button onClick={() => navigate("/")} className="flex items-center">
+          <button onClick={() => go("/")} className="flex items-center">
             <img
               src="https://cdn.poehali.dev/projects/deb6d332-2cc4-4c3a-bcd1-e4e0a738361b/bucket/f0381683-417d-42a0-98e9-148201492b78.png"
               alt="КОМПАС"
@@ -32,7 +41,7 @@ export default function Layout() {
             {navItems.map((item) => (
               <button
                 key={item.path}
-                onClick={() => navigate(item.path)}
+                onClick={() => go(item.path)}
                 className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                   isActive(item.path)
                     ? "bg-[#7B9D52]/10 text-[#7B9D52]"
@@ -57,7 +66,7 @@ export default function Layout() {
           {navItems.map((item) => (
             <button
               key={item.path}
-              onClick={() => navigate(item.path)}
+              onClick={() => go(item.path)}
               className={`flex-1 flex flex-col items-center gap-1 py-3 transition-colors ${
                 isActive(item.path) ? "text-[#7B9D52]" : "text-[#c0c0bc]"
               }`}
