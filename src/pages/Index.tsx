@@ -1,14 +1,27 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+import { useState } from "react";
+import Layout from "@/components/Layout";
+import Home from "./Home";
+import Cabinet from "./Cabinet";
+import FAQ from "./FAQ";
+import Contacts from "./Contacts";
 
-const Index = () => {
+type Page = "home" | "cabinet" | "faq" | "contacts";
+
+export default function Index() {
+  const [page, setPage] = useState<Page>("home");
+
+  const renderPage = () => {
+    switch (page) {
+      case "home": return <Home />;
+      case "cabinet": return <Cabinet />;
+      case "faq": return <FAQ />;
+      case "contacts": return <Contacts />;
+    }
+  };
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4 color-black text-black">Добро пожаловать!</h1>
-        <p className="text-xl text-gray-600">тут будет отображаться ваш проект</p>
-      </div>
-    </div>
+    <Layout page={page} onNav={setPage}>
+      {renderPage()}
+    </Layout>
   );
-};
-
-export default Index;
+}
