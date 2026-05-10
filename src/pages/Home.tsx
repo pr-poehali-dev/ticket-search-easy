@@ -11,7 +11,7 @@ const popularRoutes = [
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-[#f7f7f6]">
+    <div className="min-h-screen bg-[#e5e5e3]">
       {/* Hero */}
       <section className="px-6 pt-20 pb-16 max-w-4xl mx-auto animate-slide-up">
         <p className="text-xs font-medium tracking-[0.2em] uppercase text-[#8a8a8a] mb-4 font-['IBM_Plex_Mono']">
