@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Icon from "@/components/ui/icon";
 import { useAuth, type PassengerProfile, type City } from "@/hooks/useAuth";
 
@@ -481,7 +481,35 @@ export default function Cabinet() {
 
         {tab === "profile" && <ProfileTab />}
         {tab === "passport" && <PassportTab />}
+
+        <AviasalesWidget />
       </div>
     </div>
   );
+}
+
+function AviasalesWidget() {
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!ref.current) return;
+    ref.current.innerHTML = "";
+    const script = document.createElement("script");
+    script.src = "https://tpemd.com/content";
+    script.async = true;
+    script.charset = "utf-8";
+    script.setAttribute("data-currency", "usd");
+    script.setAttribute("data-trs", "527526");
+    script.setAttribute("data-shmarker", "727110.727110");
+    script.setAttribute("data-target_host", "www.aviasales.ru/search");
+    script.setAttribute("data-locale", "ru");
+    script.setAttribute("data-limit", "7");
+    script.setAttribute("data-powered_by", "false");
+    script.setAttribute("data-primary", "#0085FF");
+    script.setAttribute("data-promo_id", "4044");
+    script.setAttribute("data-campaign_id", "100");
+    ref.current.appendChild(script);
+  }, []);
+
+  return <div ref={ref} className="mt-8" />;
 }
