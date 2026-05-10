@@ -14,9 +14,6 @@ export default function Home() {
     <div className="min-h-screen bg-[#e5e5e3]">
       {/* Hero */}
       <section className="px-6 pt-20 pb-16 max-w-4xl mx-auto animate-slide-up">
-        <p className="text-xs font-medium tracking-[0.2em] uppercase text-[#8a8a8a] mb-4 font-['IBM_Plex_Mono']">
-          Поиск авиабилетов
-        </p>
         <h1 className="text-5xl font-semibold text-[#111] leading-tight mb-2">
           Летите туда,
           <br />
