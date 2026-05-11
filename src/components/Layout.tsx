@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Outlet, useNavigate, useLocation } from "react-router-dom";
 import Icon from "@/components/ui/icon";
 import CookieBanner from "@/components/CookieBanner";
+import Mascot from "@/components/Mascot";
 
 const navItems = [
   { path: "/", label: "Поиск", icon: "Search" },
@@ -244,6 +245,7 @@ export default function Layout() {
         </div>
       </footer>
 
+      <Mascot />
       <CookieBanner />
     </div>
   );
