@@ -223,10 +223,6 @@ export default function Home() {
         </p>
       </section>
 
-      <section className="px-6 pb-4 max-w-4xl mx-auto">
-        <MascotTip />
-      </section>
-
       <section className="px-6 pb-8 max-w-4xl mx-auto">
         {!widgetReady && (
           <div className="bg-white border border-[#e8e8e6] rounded-2xl p-8 animate-pulse">
@@ -247,6 +243,12 @@ export default function Home() {
         )}
         <div id="tpwl-search" className={widgetReady ? "" : "hidden"}></div>
       </section>
+
+      {widgetReady && (
+        <section className="px-6 pb-8 max-w-4xl mx-auto animate-slide-up">
+          <MascotTip />
+        </section>
+      )}
 
       <section className="px-6 pb-16 max-w-4xl mx-auto">
         <div id="tpwl-tickets"></div>
