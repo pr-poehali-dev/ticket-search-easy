@@ -217,7 +217,7 @@ export default function Layout() {
             <p className="text-xs text-[#8a8a8a] font-['IBM_Plex_Mono'] leading-relaxed">
               Проект входит в экосистему корпорации «Даббл» — 2026
             </p>
-            <div className="flex flex-wrap gap-x-6 gap-y-2">
+            <div className="flex flex-wrap gap-x-6 gap-y-2 items-center">
               {[
                 { label: "Пользовательское соглашение", path: "/terms" },
                 { label: "Политика конфиденциальности", path: "/privacy" },
@@ -230,6 +230,15 @@ export default function Layout() {
                   {t.label}
                 </button>
               ))}
+              <button
+                onClick={() =>
+                  window.dispatchEvent(new Event("open-cookie-settings"))
+                }
+                className="text-xs text-[#c0c0bc] hover:text-[#111] transition-colors inline-flex items-center gap-1.5"
+              >
+                <span>🍪</span>
+                Настройки cookie
+              </button>
             </div>
           </div>
         </div>

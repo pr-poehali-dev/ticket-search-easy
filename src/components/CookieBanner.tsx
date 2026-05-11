@@ -15,6 +15,15 @@ export default function CookieBanner() {
     }
   }, []);
 
+  useEffect(() => {
+    const open = () => {
+      setClosing(false);
+      setVisible(true);
+    };
+    window.addEventListener("open-cookie-settings", open);
+    return () => window.removeEventListener("open-cookie-settings", open);
+  }, []);
+
   const close = (choice: "all" | "essential") => {
     localStorage.setItem(
       STORAGE_KEY,
