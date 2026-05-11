@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import Icon from "@/components/ui/icon";
+import MascotTip from "@/components/MascotTip";
 
 const NEWS_API = "https://functions.poehali.dev/4646c7cb-dd1b-424c-ab23-10d543cfc8c4";
 const WEATHER_API = "https://functions.poehali.dev/f1cb531b-1e57-49a1-a494-e158a960aa31";
@@ -220,6 +221,10 @@ export default function Home() {
         <p className="text-[#8a8a8a] mt-4 text-lg">
           Сравниваем цены сотен авиакомпаний — мгновенно.
         </p>
+      </section>
+
+      <section className="px-6 pb-4 max-w-4xl mx-auto">
+        <MascotTip />
       </section>
 
       <section className="px-6 pb-8 max-w-4xl mx-auto">
