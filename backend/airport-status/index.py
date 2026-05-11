@@ -4,51 +4,49 @@ import urllib.request
 from datetime import datetime, timezone, timedelta
 
 
-# Источники мониторинга закрытий аэропортов
 SOURCES = [
     "https://t.me/s/rosaviatsia_official",
     "https://t.me/s/aviatorshina",
 ]
 
-# Аэропорты России — для распознавания упоминаний в тексте
+# Аэропорт -> (Город, ключевые слова)
 AIRPORTS = {
-    "Шереметьево": ["Шереметьев"],
-    "Внуково": ["Внуков"],
-    "Домодедово": ["Домодедов"],
-    "Жуковский": ["Жуковск"],
-    "Пулково": ["Пулков"],
-    "Сочи": ["Сочи", "Адлер"],
-    "Казань": ["Казан"],
-    "Уфа": ["Уфа", "Уфы"],
-    "Самара": ["Самар", "Курумоч"],
-    "Волгоград": ["Волгоград"],
-    "Саратов": ["Саратов", "Гагарин"],
-    "Калуга": ["Калуг", "Грабцев"],
-    "Нижний Новгород": ["Нижн", "Стригино"],
-    "Краснодар": ["Краснодар", "Пашковск"],
-    "Ставрополь": ["Ставропол"],
-    "Минеральные Воды": ["Минераль"],
-    "Грозный": ["Грозн"],
-    "Махачкала": ["Махачкал", "Уйташ"],
-    "Владикавказ": ["Владикавказ", "Беслан"],
-    "Анапа": ["Анап"],
-    "Геленджик": ["Геленджик"],
-    "Ростов-на-Дону": ["Ростов", "Платов"],
-    "Ярославль": ["Ярослав", "Туношна"],
-    "Ижевск": ["Ижевск"],
-    "Тамбов": ["Тамбов"],
-    "Пенза": ["Пенз"],
-    "Псков": ["Псков"],
-    "Брянск": ["Брянск"],
-    "Белгород": ["Белгород"],
-    "Курск": ["Курск"],
-    "Воронеж": ["Воронеж", "Чертовицк"],
-    "Липецк": ["Липецк"],
-    "Орёл": ["Орёл", "Орел", "Южный"],
-    "Элиста": ["Элист"],
+    "Шереметьево": ("Москва", ["шереметьев"]),
+    "Внуково": ("Москва", ["внуков"]),
+    "Домодедово": ("Москва", ["домодедов"]),
+    "Жуковский": ("Москва", ["жуковск"]),
+    "Пулково": ("Санкт-Петербург", ["пулков"]),
+    "Сочи": ("Сочи", ["сочи", "адлер"]),
+    "Казань": ("Казань", ["казан"]),
+    "Уфа": ("Уфа", ["уфа", "уфы", "уфу"]),
+    "Курумоч": ("Самара", ["курумоч", "самар"]),
+    "Гумрак": ("Волгоград", ["волгоград", "гумрак"]),
+    "Гагарин": ("Саратов", ["саратов", "гагарин"]),
+    "Грабцево": ("Калуга", ["калуг", "грабцев"]),
+    "Стригино": ("Нижний Новгород", ["стригино", "нижн"]),
+    "Пашковский": ("Краснодар", ["краснодар", "пашковск"]),
+    "Шпаковское": ("Ставрополь", ["ставропол", "шпаковск"]),
+    "Минеральные Воды": ("Минеральные Воды", ["минераль"]),
+    "Грозный": ("Грозный", ["грозн"]),
+    "Уйташ": ("Махачкала", ["махачкал", "уйташ"]),
+    "Беслан": ("Владикавказ", ["владикавказ", "беслан"]),
+    "Анапа": ("Анапа", ["анап"]),
+    "Геленджик": ("Геленджик", ["геленджик"]),
+    "Платов": ("Ростов-на-Дону", ["ростов", "платов"]),
+    "Туношна": ("Ярославль", ["ярослав", "туношна"]),
+    "Ижевск": ("Ижевск", ["ижевск"]),
+    "Тамбов": ("Тамбов", ["тамбов"]),
+    "Пенза": ("Пенза", ["пенз"]),
+    "Псков": ("Псков", ["псков"]),
+    "Брянск": ("Брянск", ["брянск"]),
+    "Белгород": ("Белгород", ["белгород"]),
+    "Курск": ("Курск", ["курск"]),
+    "Чертовицкое": ("Воронеж", ["воронеж", "чертовиц"]),
+    "Липецк": ("Липецк", ["липецк"]),
+    "Южный": ("Орёл", ["орёл", "орел"]),
+    "Элиста": ("Элиста", ["элист"]),
 }
 
-# Слова, указывающие на ограничения
 RESTRICT_KEYWORDS = [
     "ограничен",
     "ограничения",
@@ -62,14 +60,12 @@ RESTRICT_KEYWORDS = [
     "план ковер",
 ]
 
-# Слова, указывающие на снятие ограничений
 RESUME_KEYWORDS = [
     "сняты",
     "снято",
     "возобновлен",
     "возобновлён",
     "вновь принимает",
-    "открыт",
     "штатно",
 ]
 
@@ -78,6 +74,7 @@ CORS_HEADERS = {
     "Access-Control-Allow-Methods": "GET, OPTIONS",
     "Access-Control-Allow-Headers": "Content-Type",
     "Content-Type": "application/json; charset=utf-8",
+    "Cache-Control": "no-store, no-cache, must-revalidate",
 }
 
 
@@ -104,17 +101,12 @@ def strip_html(text: str) -> str:
 
 
 def parse_telegram(html: str):
-    """Парсит публичную страницу t.me/s/<channel>."""
     posts = []
-
-    # Каждый пост идёт в блоке tgme_widget_message_text
     text_pattern = re.compile(
         r'<div class="tgme_widget_message_text[^"]*"[^>]*>(.*?)</div>',
         re.DOTALL,
     )
-    time_pattern = re.compile(
-        r'<time class="time"[^>]*datetime="([^"]+)"',
-    )
+    time_pattern = re.compile(r'<time class="time"[^>]*datetime="([^"]+)"')
 
     texts = text_pattern.findall(html)
     times = time_pattern.findall(html)
@@ -132,27 +124,25 @@ def parse_telegram(html: str):
 def detect_airports(text: str):
     found = []
     text_lower = text.lower()
-    for name, keywords in AIRPORTS.items():
+    for name, (city, keywords) in AIRPORTS.items():
         for kw in keywords:
-            if kw.lower() in text_lower:
-                found.append(name)
+            if kw in text_lower:
+                found.append((name, city))
                 break
     return found
 
 
 def is_restriction(text: str) -> bool:
-    text_lower = text.lower()
-    return any(kw in text_lower for kw in RESTRICT_KEYWORDS)
+    return any(kw in text.lower() for kw in RESTRICT_KEYWORDS)
 
 
 def is_resume(text: str) -> bool:
-    text_lower = text.lower()
-    return any(kw in text_lower for kw in RESUME_KEYWORDS)
+    return any(kw in text.lower() for kw in RESUME_KEYWORDS)
 
 
-def format_date(iso_str: str) -> str:
+def format_dt(iso_str: str) -> dict:
     if not iso_str:
-        return ""
+        return {"text": "", "iso": ""}
     try:
         dt = datetime.fromisoformat(iso_str.replace("Z", "+00:00"))
         msk = dt.astimezone(timezone(timedelta(hours=3)))
@@ -160,22 +150,18 @@ def format_date(iso_str: str) -> str:
             "янв", "фев", "мар", "апр", "мая", "июн",
             "июл", "авг", "сен", "окт", "ноя", "дек",
         ]
-        return f"{msk.day} {months[msk.month - 1]}, {msk.strftime('%H:%M')}"
+        return {
+            "text": f"{msk.day} {months[msk.month - 1]}, {msk.strftime('%H:%M')}",
+            "iso": dt.isoformat(),
+        }
     except (ValueError, IndexError):
-        return ""
-
-
-def shorten(text: str, limit: int = 220) -> str:
-    text = re.sub(r"\s+", " ", text).strip()
-    if len(text) <= limit:
-        return text
-    return text[: limit - 1].rstrip() + "…"
+        return {"text": "", "iso": ""}
 
 
 def handler(event: dict, context) -> dict:
     """
-    Возвращает свежие сообщения о закрытиях/ограничениях работы аэропортов России.
-    GET /airport-status -> { alerts: [...], updatedAt }
+    Статусы аэропортов России: введение и снятие ограничений.
+    GET -> { items: [{airport, city, status, restrictedAt, resumedAt}], updatedAt }
     """
     method = event.get("httpMethod", "GET")
 
@@ -190,8 +176,7 @@ def handler(event: dict, context) -> dict:
             "isBase64Encoded": False,
         }
 
-    seen_texts = set()
-    alerts = []
+    state = {}
 
     for src in SOURCES:
         try:
@@ -200,15 +185,9 @@ def handler(event: dict, context) -> dict:
         except Exception:
             continue
 
-        # Свежие посты идут последними — берём с конца
-        for post in reversed(posts):
+        for post in posts:
             text = post["text"]
             if not text or len(text) < 20:
-                continue
-
-            # Дедупликация по началу текста
-            sig = text[:80]
-            if sig in seen_texts:
                 continue
 
             airports = detect_airports(text)
@@ -218,33 +197,70 @@ def handler(event: dict, context) -> dict:
             if not airports or (not restriction and not resume):
                 continue
 
-            seen_texts.add(sig)
+            dt_info = format_dt(post["datetime"])
 
-            status = "resume" if resume and not restriction else "restriction"
-            alerts.append({
-                "status": status,
-                "airports": airports,
-                "title": (
-                    "Ограничения сняты"
-                    if status == "resume"
-                    else "Введены ограничения"
-                ),
-                "text": shorten(text, 240),
-                "date": format_date(post["datetime"]),
-                "source": src,
-            })
+            for ap_name, city in airports:
+                entry = state.get(ap_name, {
+                    "airport": ap_name,
+                    "city": city,
+                    "restrictedAt": None,
+                    "resumedAt": None,
+                    "restrictedAtIso": None,
+                    "resumedAtIso": None,
+                })
 
-            if len(alerts) >= 8:
-                break
+                if resume and not restriction:
+                    if not entry["resumedAtIso"] or dt_info["iso"] > entry["resumedAtIso"]:
+                        entry["resumedAt"] = dt_info["text"]
+                        entry["resumedAtIso"] = dt_info["iso"]
+                elif restriction:
+                    if not entry["restrictedAtIso"] or dt_info["iso"] > entry["restrictedAtIso"]:
+                        entry["restrictedAt"] = dt_info["text"]
+                        entry["restrictedAtIso"] = dt_info["iso"]
+                        if entry["resumedAtIso"] and entry["resumedAtIso"] < dt_info["iso"]:
+                            entry["resumedAt"] = None
+                            entry["resumedAtIso"] = None
 
-        if len(alerts) >= 8:
-            break
+                state[ap_name] = entry
+
+    items = []
+    for entry in state.values():
+        r_iso = entry["restrictedAtIso"]
+        s_iso = entry["resumedAtIso"]
+
+        if r_iso and (not s_iso or s_iso < r_iso):
+            status = "restriction"
+            sort_iso = r_iso
+        elif s_iso:
+            status = "resume"
+            sort_iso = s_iso
+        else:
+            continue
+
+        items.append({
+            "airport": entry["airport"],
+            "city": entry["city"],
+            "status": status,
+            "restrictedAt": entry["restrictedAt"] or "",
+            "resumedAt": entry["resumedAt"] or "",
+            "sortIso": sort_iso,
+        })
+
+    items.sort(
+        key=lambda x: (
+            x["status"] != "restriction",
+            -datetime.fromisoformat(x["sortIso"]).timestamp(),
+        )
+    )
+
+    for it in items:
+        it.pop("sortIso", None)
 
     return {
         "statusCode": 200,
         "headers": CORS_HEADERS,
         "body": json.dumps(
-            {"alerts": alerts, "updatedAt": datetime.utcnow().isoformat() + "Z"},
+            {"items": items, "updatedAt": datetime.utcnow().isoformat() + "Z"},
             ensure_ascii=False,
         ),
         "isBase64Encoded": False,
