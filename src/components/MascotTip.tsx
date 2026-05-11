@@ -79,10 +79,26 @@ export default function MascotTip() {
   };
 
   return (
-    <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#1a1f17] via-[#222820] to-[#1a1f17] shadow-[0_20px_60px_-15px_rgba(0,0,0,0.35)]">
-      {/* Декоративные элементы */}
+    <div className="relative overflow-hidden rounded-3xl bg-[#1a1f17] shadow-[0_20px_60px_-15px_rgba(0,0,0,0.35)] min-h-[320px]">
+      {/* Фото-фон города (плавно переключается) */}
+      {MASCOT_STORIES.map((s, i) => (
+        <div
+          key={s.bg}
+          aria-hidden
+          className={`absolute inset-0 bg-cover bg-center transition-opacity duration-700 ${
+            i === idx ? "opacity-100" : "opacity-0"
+          }`}
+          style={{ backgroundImage: `url(${s.bg})` }}
+        />
+      ))}
+
+      {/* Затемнение для читаемости */}
+      <div className="absolute inset-0 bg-gradient-to-br from-[#0d100b]/85 via-[#1a1f17]/70 to-[#1a1f17]/95" />
+      <div className="absolute inset-0 bg-gradient-to-t from-[#0d100b]/90 via-transparent to-transparent" />
+
+      {/* Декоративные акцентные пятна */}
       <div className="absolute top-0 right-0 w-64 h-64 bg-[#7B9D52] opacity-20 blur-3xl rounded-full -translate-y-20 translate-x-20 pointer-events-none" />
-      <div className="absolute bottom-0 left-1/3 w-48 h-48 bg-[#c97a2b] opacity-10 blur-3xl rounded-full translate-y-20 pointer-events-none" />
+      <div className="absolute bottom-0 left-1/3 w-48 h-48 bg-[#c97a2b] opacity-15 blur-3xl rounded-full translate-y-20 pointer-events-none" />
 
       {/* Тонкая верхняя линия */}
       <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#7B9D52]/60 to-transparent" />
