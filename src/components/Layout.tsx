@@ -217,16 +217,18 @@ export default function Layout() {
               Проект входит в экосистему корпорации «Даббл» — 2026
             </p>
             <div className="flex flex-wrap gap-x-6 gap-y-2">
-              {["Пользовательское соглашение", "Политика конфиденциальности"].map(
-                (t) => (
-                  <button
-                    key={t}
-                    className="text-xs text-[#c0c0bc] hover:text-[#111] transition-colors"
-                  >
-                    {t}
-                  </button>
-                ),
-              )}
+              {[
+                { label: "Пользовательское соглашение", path: "/terms" },
+                { label: "Политика конфиденциальности", path: "/privacy" },
+              ].map((t) => (
+                <button
+                  key={t.path}
+                  onClick={() => go(t.path)}
+                  className="text-xs text-[#c0c0bc] hover:text-[#111] transition-colors"
+                >
+                  {t.label}
+                </button>
+              ))}
             </div>
           </div>
         </div>
