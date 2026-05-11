@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { Outlet, useNavigate, useLocation } from "react-router-dom";
 import Icon from "@/components/ui/icon";
 
@@ -11,18 +12,34 @@ const navItems = [
 export default function Layout() {
   const navigate = useNavigate();
   const location = useLocation();
+  const [mobileOpen, setMobileOpen] = useState(false);
 
   const isActive = (path: string) =>
     path === "/" ? location.pathname === "/" : location.pathname.startsWith(path);
 
   const go = (path: string) => {
-    // На главную — всегда полная перезагрузка, чтобы виджет поиска инициализировался заново
+    setMobileOpen(false);
     if (path === "/") {
       window.location.href = "/";
     } else {
       navigate(path);
     }
   };
+
+  useEffect(() => {
+    setMobileOpen(false);
+  }, [location.pathname]);
+
+  useEffect(() => {
+    if (mobileOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [mobileOpen]);
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -37,6 +54,7 @@ export default function Layout() {
             />
           </button>
 
+          {/* Desktop nav */}
           <nav className="hidden sm:flex items-center gap-1">
             {navItems.map((item) => (
               <button
@@ -52,49 +70,164 @@ export default function Layout() {
               </button>
             ))}
           </nav>
+
+          {/* Mobile icons */}
+          <div className="flex sm:hidden items-center gap-2">
+            <button
+              onClick={() => go("/cabinet")}
+              aria-label="Личный кабинет"
+              className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all ${
+                isActive("/cabinet")
+                  ? "bg-[#7B9D52]/10 text-[#7B9D52]"
+                  : "text-[#111] hover:bg-[#f7f7f6]"
+              }`}
+            >
+              <Icon name="User" size={20} />
+            </button>
+            <button
+              onClick={() => setMobileOpen((v) => !v)}
+              aria-label="Открыть меню"
+              className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all ${
+                mobileOpen
+                  ? "bg-[#111] text-white"
+                  : "text-[#111] hover:bg-[#f7f7f6]"
+              }`}
+            >
+              <Icon name={mobileOpen ? "X" : "Menu"} size={20} />
+            </button>
+          </div>
         </div>
       </header>
+
+      {/* Mobile menu drawer */}
+      {mobileOpen && (
+        <div
+          className="sm:hidden fixed inset-0 top-16 z-40 bg-black/40 backdrop-blur-sm animate-fade-in"
+          onClick={() => setMobileOpen(false)}
+        >
+          <div
+            className="bg-white border-b border-[#e8e8e6] shadow-lg animate-slide-down"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <nav className="px-4 py-4 space-y-1">
+              {navItems.map((item) => (
+                <button
+                  key={item.path}
+                  onClick={() => go(item.path)}
+                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${
+                    isActive(item.path)
+                      ? "bg-[#7B9D52]/10 text-[#7B9D52]"
+                      : "text-[#111] hover:bg-[#f7f7f6]"
+                  }`}
+                >
+                  <Icon name={item.icon} size={18} />
+                  <span>{item.label}</span>
+                </button>
+              ))}
+            </nav>
+          </div>
+        </div>
+      )}
 
       {/* Content */}
       <main className="flex-1">
         <Outlet />
       </main>
 
-      {/* Mobile bottom nav */}
-      <nav className="sm:hidden fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-[#e8e8e6] z-50">
-        <div className="flex">
-          {navItems.map((item) => (
-            <button
-              key={item.path}
-              onClick={() => go(item.path)}
-              className={`flex-1 flex flex-col items-center gap-1 py-3 transition-colors ${
-                isActive(item.path) ? "text-[#7B9D52]" : "text-[#c0c0bc]"
-              }`}
-            >
-              <Icon name={item.icon} size={18} />
-              <span className="text-[10px] font-medium">{item.label}</span>
-            </button>
-          ))}
-        </div>
-      </nav>
-
       {/* Footer */}
-      <footer className="hidden sm:block border-t border-[#e8e8e6] bg-white">
-        <div className="max-w-4xl mx-auto px-6 py-6 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <img
-              src="https://cdn.poehali.dev/projects/deb6d332-2cc4-4c3a-bcd1-e4e0a738361b/bucket/f0381683-417d-42a0-98e9-148201492b78.png"
-              alt="КОМПАС"
-              className="h-6 w-auto opacity-30"
-            />
-            <span className="text-xs text-[#c0c0bc] font-['IBM_Plex_Mono']">© 2025</span>
+      <footer className="border-t border-[#e8e8e6] bg-gradient-to-b from-white to-[#f7f7f6] mt-12">
+        <div className="max-w-6xl mx-auto px-6 py-12">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-10">
+            {/* Brand */}
+            <div className="md:col-span-2 space-y-4">
+              <div className="flex items-center gap-3">
+                <img
+                  src="https://cdn.poehali.dev/projects/deb6d332-2cc4-4c3a-bcd1-e4e0a738361b/bucket/f0381683-417d-42a0-98e9-148201492b78.png"
+                  alt="КОМПАС"
+                  className="h-8 w-auto"
+                />
+              </div>
+              <p className="text-sm text-[#8a8a8a] max-w-sm leading-relaxed">
+                Сравниваем цены сотен авиакомпаний — находим лучшие билеты и помогаем в пути.
+              </p>
+              <div className="flex items-center gap-2 pt-1">
+                <a
+                  href="https://t.me/DUBBLE_RF"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Telegram"
+                  className="w-9 h-9 rounded-xl bg-white border border-[#e8e8e6] flex items-center justify-center text-[#8a8a8a] hover:text-[#111] hover:border-[#111] transition-all"
+                >
+                  <Icon name="Send" size={16} />
+                </a>
+                <a
+                  href="mailto:business.dabblrus@bk.ru"
+                  aria-label="Email"
+                  className="w-9 h-9 rounded-xl bg-white border border-[#e8e8e6] flex items-center justify-center text-[#8a8a8a] hover:text-[#111] hover:border-[#111] transition-all"
+                >
+                  <Icon name="Mail" size={16} />
+                </a>
+              </div>
+            </div>
+
+            {/* Sections */}
+            <div className="space-y-3">
+              <p className="text-[10px] tracking-[0.2em] uppercase text-[#c0c0bc] font-['IBM_Plex_Mono'] font-medium">
+                Сервис
+              </p>
+              {navItems.map((item) => (
+                <button
+                  key={item.path}
+                  onClick={() => go(item.path)}
+                  className="block text-sm text-[#444] hover:text-[#111] transition-colors"
+                >
+                  {item.label}
+                </button>
+              ))}
+            </div>
+
+            {/* Contacts */}
+            <div className="space-y-3">
+              <p className="text-[10px] tracking-[0.2em] uppercase text-[#c0c0bc] font-['IBM_Plex_Mono'] font-medium">
+                Контакты
+              </p>
+              <a
+                href="mailto:business.dabblrus@bk.ru"
+                className="block text-sm text-[#444] hover:text-[#111] transition-colors break-all"
+              >
+                business.dabblrus@bk.ru
+              </a>
+              <a
+                href="https://t.me/DUBBLE_RF"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block text-sm text-[#444] hover:text-[#111] transition-colors"
+              >
+                @DUBBLE_RF
+              </a>
+              <p className="text-xs text-[#8a8a8a]">
+                Поддержка — круглосуточно
+              </p>
+            </div>
           </div>
-          <div className="flex gap-6">
-            {["Пользовательское соглашение", "Политика конфиденциальности"].map((t) => (
-              <button key={t} className="text-xs text-[#c0c0bc] hover:text-[#8a8a8a] transition-colors">
-                {t}
-              </button>
-            ))}
+
+          {/* Bottom bar */}
+          <div className="pt-6 border-t border-[#e8e8e6] flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+            <p className="text-xs text-[#8a8a8a] font-['IBM_Plex_Mono'] leading-relaxed">
+              Проект входит в экосистему корпорации «Даббл» — 2026
+            </p>
+            <div className="flex flex-wrap gap-x-6 gap-y-2">
+              {["Пользовательское соглашение", "Политика конфиденциальности"].map(
+                (t) => (
+                  <button
+                    key={t}
+                    className="text-xs text-[#c0c0bc] hover:text-[#111] transition-colors"
+                  >
+                    {t}
+                  </button>
+                ),
+              )}
+            </div>
           </div>
         </div>
       </footer>
