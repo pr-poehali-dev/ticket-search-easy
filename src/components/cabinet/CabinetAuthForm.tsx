@@ -13,10 +13,15 @@ export default function CabinetAuthForm({ onSuccess }: { onSuccess: () => void }
   const [lastName, setLastName] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [agree, setAgree] = useState(false);
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     setError("");
+    if (mode === "register" && !agree) {
+      setError("Необходимо согласиться с условиями");
+      return;
+    }
     setLoading(true);
     const result = mode === "login"
       ? await login(email, password)
@@ -105,14 +110,61 @@ export default function CabinetAuthForm({ onSuccess }: { onSuccess: () => void }
               />
             </div>
 
+            {mode === "register" && (
+              <label className="flex items-start gap-3 cursor-pointer select-none group">
+                <span className="relative flex-shrink-0 mt-0.5">
+                  <input
+                    type="checkbox"
+                    checked={agree}
+                    onChange={(e) => setAgree(e.target.checked)}
+                    className="peer sr-only"
+                  />
+                  <span
+                    className={`w-5 h-5 rounded-md border-2 flex items-center justify-center transition-all ${
+                      agree
+                        ? "bg-[#7B9D52] border-[#7B9D52]"
+                        : "border-[#d4d4d2] group-hover:border-[#111]"
+                    }`}
+                  >
+                    {agree && (
+                      <Icon name="Check" size={13} className="text-white" strokeWidth={3} />
+                    )}
+                  </span>
+                </span>
+                <span className="text-xs text-[#8a8a8a] leading-relaxed">
+                  Я согласен с{" "}
+                  <a
+                    href="/terms"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={(e) => e.stopPropagation()}
+                    className="text-[#111] underline underline-offset-2 hover:text-[#7B9D52]"
+                  >
+                    пользовательским соглашением
+                  </a>{" "}
+                  и{" "}
+                  <a
+                    href="/privacy"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={(e) => e.stopPropagation()}
+                    className="text-[#111] underline underline-offset-2 hover:text-[#7B9D52]"
+                  >
+                    политикой конфиденциальности
+                  </a>
+                  .
+                </span>
+              </label>
+            )}
+
             {error && (
               <p className="text-sm text-red-500 bg-red-50 rounded-xl px-4 py-3">{error}</p>
             )}
 
             <button
               type="submit"
-              disabled={loading}
-              className="w-full bg-[#7B9D52] text-white py-3.5 rounded-xl font-semibold hover:bg-[#6a8a44] transition-colors text-sm disabled:opacity-60"
+              disabled={loading || (mode === "register" && !agree)}
+              className="w-full bg-[#7B9D52] text-white py-3.5 rounded-xl font-semibold hover:bg-[#6a8a44] transition-colors text-sm disabled:opacity-60 disabled:cursor-not-allowed"
             >
               {loading ? "Загрузка..." : mode === "login" ? "Войти" : "Зарегистрироваться"}
             </button>
