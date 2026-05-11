@@ -216,11 +216,7 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-[#e5e5e3]">
       <section className="px-6 pt-20 pb-10 max-w-4xl mx-auto animate-slide-up">
-        <h1 className="text-5xl font-semibold text-[#111] leading-tight mb-2">
-          Летите туда,
-          <br />
-          куда хочется.
-        </h1>
+        <h1 className="text-5xl font-semibold text-[#111] leading-tight mb-2">Летите туда, куда хотите!</h1>
         <p className="text-[#8a8a8a] mt-4 text-lg">
           Сравниваем цены сотен авиакомпаний — мгновенно.
         </p>
