@@ -115,7 +115,7 @@ export default function Contacts() {
               {
                 icon: "MessageCircle",
                 label: "Telegram-бот",
-                value: "@FlightsSupport",
+                value: "@DUBBLE_RF",
                 sub: "Круглосуточно",
               },
             ].map((item) => (
