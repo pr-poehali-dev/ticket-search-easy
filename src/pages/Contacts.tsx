@@ -103,7 +103,7 @@ export default function Contacts() {
               {
                 icon: "Mail",
                 label: "Email поддержки",
-                value: "support@flights.ru",
+                value: "business.dabblrus@bk.ru",
                 sub: "Ответим за несколько часов",
               },
               {
