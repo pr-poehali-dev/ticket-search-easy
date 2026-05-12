@@ -44,9 +44,6 @@ export default function SearchWidget() {
 
     const fallback = setTimeout(() => setWidgetReady(true), 10000);
 
-    const ticketsEl = document.getElementById("tpwl-tickets");
-    const searchEl = document.getElementById("tpwl-search");
-
     const scrollToResults = () => {
       const el = document.getElementById("tpwl-tickets");
       if (!el) return;
@@ -55,42 +52,71 @@ export default function SearchWidget() {
       window.scrollTo({ top, behavior: "smooth" });
     };
 
-    // Перехват клика «Найти билеты» в форме виджета
-    const onSearchClick = (e: Event) => {
-      const target = e.target as HTMLElement | null;
-      if (!target) return;
-      const btn = target.closest(
-        'button, [role="button"], a',
-      ) as HTMLElement | null;
-      if (!btn) return;
-      const text = (btn.textContent || "").toLowerCase().trim();
-      const aria = (btn.getAttribute("aria-label") || "").toLowerCase();
-      const isSearchBtn =
-        text.includes("найти") ||
-        text.includes("поиск") ||
-        text.includes("search") ||
-        aria.includes("найти") ||
-        aria.includes("search") ||
-        btn.getAttribute("type") === "submit";
-      if (!isSearchBtn) return;
-
+    const startSearchingUX = () => {
       setSearching(true);
       if (searchingTimer.current) clearTimeout(searchingTimer.current);
-      // Плашка висит до момента появления результатов, но не больше 30 сек
       searchingTimer.current = window.setTimeout(
         () => setSearching(false),
         30000,
       );
-
-      // Скроллим к зоне результатов сразу + повторяем после рендера виджетом
       setTimeout(scrollToResults, 100);
-      setTimeout(scrollToResults, 800);
-      setTimeout(scrollToResults, 1800);
+      setTimeout(scrollToResults, 1000);
+      setTimeout(scrollToResults, 2500);
     };
 
+    // 1) Перехват fetch — основной способ ловли запроса поиска
+    const origFetch = window.fetch;
+    const isSearchUrl = (url: string) =>
+      /apistp\.com|aviasales|tpemd\.com\/.*search|flights.*search|prices.*graphql/i.test(
+        url,
+      );
+
+    window.fetch = function (
+      input: RequestInfo | URL,
+      init?: RequestInit,
+    ): Promise<Response> {
+      try {
+        const url =
+          typeof input === "string"
+            ? input
+            : input instanceof URL
+              ? input.toString()
+              : (input as Request).url;
+        if (url && isSearchUrl(url)) {
+          startSearchingUX();
+        }
+      } catch {
+        /* noop */
+      }
+      return origFetch.call(this, input as RequestInfo, init);
+    };
+
+    // 2) Перехват XHR — на всякий случай
+    const origXhrOpen = XMLHttpRequest.prototype.open;
+    XMLHttpRequest.prototype.open = function (
+      method: string,
+      url: string | URL,
+      ...rest: unknown[]
+    ) {
+      try {
+        const u = typeof url === "string" ? url : url.toString();
+        if (u && isSearchUrl(u)) {
+          startSearchingUX();
+        }
+      } catch {
+        /* noop */
+      }
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      return origXhrOpen.apply(this, [method, url, ...rest] as any);
+    };
+
+    // 3) Дополнительный fallback — клик внутри #tpwl-search
+    const searchEl = document.getElementById("tpwl-search");
+    const onSearchClick = () => startSearchingUX();
     searchEl?.addEventListener("click", onSearchClick, true);
 
-    // Наблюдаем за появлением результатов — снимаем плашку и снова прокручиваем
+    // 4) Снимаем плашку, когда в #tpwl-tickets появился контент
+    const ticketsEl = document.getElementById("tpwl-tickets");
     let ticketsObserver: MutationObserver | null = null;
     if (ticketsEl) {
       ticketsObserver = new MutationObserver(() => {
@@ -111,6 +137,8 @@ export default function SearchWidget() {
       observer?.disconnect();
       ticketsObserver?.disconnect();
       searchEl?.removeEventListener("click", onSearchClick, true);
+      window.fetch = origFetch;
+      XMLHttpRequest.prototype.open = origXhrOpen;
       if (searchingTimer.current) clearTimeout(searchingTimer.current);
       clearTimeout(fallback);
     };
