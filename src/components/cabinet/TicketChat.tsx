@@ -297,6 +297,16 @@ ${messagesHtml}
         )}
       </div>
 
+      {!isAdmin && !isClosed && (
+        <div className="bg-[#f3efff] border-t border-[#d9cfff] px-4 sm:px-5 py-2.5 flex gap-2 items-start text-xs text-[#4a3d8a]">
+          <Icon name="Sparkles" size={13} className="mt-0.5 flex-shrink-0" />
+          <span>
+            Первым отвечает ИИ-ассистент <b>Гоша</b>. Это автоматический ответ — он может содержать неточности.
+            По возвратам, оплате и спорным вопросам подключится специалист поддержки.
+          </span>
+        </div>
+      )}
+
       {/* Messages */}
       <div ref={scrollRef} className="p-4 sm:p-5 space-y-3 max-h-[480px] overflow-y-auto bg-[#fafafa]">
         {messages.map((m) => {

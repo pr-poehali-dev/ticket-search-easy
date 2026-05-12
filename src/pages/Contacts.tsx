@@ -25,10 +25,15 @@ export default function Contacts() {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [createdId, setCreatedId] = useState<number | null>(null);
+  const [consent, setConsent] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user) return;
+    if (!consent) {
+      setError("Необходимо подтвердить согласие на обработку персональных данных");
+      return;
+    }
     setSubmitting(true);
     setError(null);
     try {
@@ -48,6 +53,7 @@ export default function Contacts() {
       setPosition("");
       setMessage("");
       setDepartment(DEPARTMENTS[0]);
+      setConsent(false);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Не удалось отправить");
     } finally {
@@ -214,14 +220,38 @@ export default function Contacts() {
                   />
                 </div>
 
+                <div className="bg-[#f3efff] border border-[#d9cfff] rounded-xl p-3 flex gap-2 text-xs text-[#4a3d8a] leading-relaxed">
+                  <Icon name="Sparkles" size={14} className="mt-0.5 flex-shrink-0" />
+                  <span>
+                    На первое сообщение ответит ИИ-ассистент Гоша. Ответы могут содержать неточности.
+                    По вопросам возвратов, оплаты и спорам подключится специалист.
+                  </span>
+                </div>
+
+                <label className="flex items-start gap-2.5 cursor-pointer select-none">
+                  <input
+                    type="checkbox"
+                    checked={consent}
+                    onChange={(e) => setConsent(e.target.checked)}
+                    className="mt-0.5 w-4 h-4 rounded border-[#c0c0bc] text-[#7B9D52] focus:ring-[#7B9D52] accent-[#7B9D52]"
+                  />
+                  <span className="text-xs text-[#444] leading-relaxed">
+                    Я даю согласие на обработку моих персональных данных в соответствии с{" "}
+                    <Link to="/privacy" target="_blank" className="text-[#111] underline hover:text-[#7B9D52]">
+                      Политикой конфиденциальности
+                    </Link>{" "}
+                    для рассмотрения настоящего обращения.
+                  </span>
+                </label>
+
                 {error && (
                   <p className="text-sm text-red-600">{error}</p>
                 )}
 
                 <button
                   type="submit"
-                  disabled={submitting}
-                  className="w-full bg-[#111] text-white py-3 rounded-xl text-sm font-semibold hover:bg-[#333] transition-colors disabled:opacity-50"
+                  disabled={submitting || !consent}
+                  className="w-full bg-[#111] text-white py-3 rounded-xl text-sm font-semibold hover:bg-[#333] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {submitting ? "Отправляем…" : "Отправить обращение"}
                 </button>
