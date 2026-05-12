@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import Icon from "@/components/ui/icon";
 import { MASCOT_STORIES } from "@/data/mascotStories";
 
@@ -16,7 +15,6 @@ const formatPrice = (n: number) =>
   new Intl.NumberFormat("ru-RU").format(n) + " ₽";
 
 export default function Sovety() {
-  const navigate = useNavigate();
   const [filter, setFilter] = useState<Filter>("all");
   const [openId, setOpenId] = useState<number | null>(null);
   const [copiedCity, setCopiedCity] = useState<string | null>(null);
@@ -76,7 +74,10 @@ export default function Sovety() {
       params.set("month", monthToNum[month.toLowerCase()]);
     }
 
-    setTimeout(() => navigate(`/?${params.toString()}`), 600);
+    // Полная перезагрузка — гарантирует свежую инициализацию виджета Aviasales
+    setTimeout(() => {
+      window.location.href = `/?${params.toString()}`;
+    }, 500);
   };
 
   return (
@@ -99,7 +100,9 @@ export default function Sovety() {
 
         <div className="relative max-w-6xl mx-auto px-6 pt-16 pb-20 sm:pt-24 sm:pb-28">
           <button
-            onClick={() => navigate("/")}
+            onClick={() => {
+              window.location.href = "/";
+            }}
             className="inline-flex items-center gap-1.5 text-white/60 hover:text-white text-xs tracking-[0.2em] uppercase font-['IBM_Plex_Mono'] mb-10 transition-colors"
           >
             <Icon name="ArrowLeft" size={14} />
@@ -348,7 +351,9 @@ export default function Sovety() {
               </p>
             </div>
             <button
-              onClick={() => navigate("/")}
+              onClick={() => {
+                window.location.href = "/";
+              }}
               className="bg-white text-[#1a1f17] font-semibold px-6 py-3 rounded-full hover:bg-[#f5efe3] transition-all flex items-center gap-2 shadow-xl shrink-0"
             >
               <Icon name="Search" size={16} />
