@@ -66,10 +66,16 @@ export default function SearchWidget() {
 
     // 1) Перехват fetch — основной способ ловли запроса поиска
     const origFetch = window.fetch;
-    const isSearchUrl = (url: string) =>
-      /apistp\.com|aviasales|tpemd\.com\/.*search|flights.*search|prices.*graphql/i.test(
+    const isSearchUrl = (url: string) => {
+      // Исключаем вспомогательные эндпоинты: автокомплит мест, локация, конфиги
+      if (/whereami|places|autocomplete|suggest|config|favicon|\.css|\.svg|\.png|\.woff/i.test(url)) {
+        return false;
+      }
+      // Реальный поисковый запрос Travelpayouts
+      return /apistp\.com.*(flights|tickets|prices|search)|prices.*graphql|search_id|search_start/i.test(
         url,
       );
+    };
 
     window.fetch = function (
       input: RequestInfo | URL,
@@ -110,12 +116,7 @@ export default function SearchWidget() {
       return origXhrOpen.apply(this, [method, url, ...rest] as any);
     };
 
-    // 3) Дополнительный fallback — клик внутри #tpwl-search
-    const searchEl = document.getElementById("tpwl-search");
-    const onSearchClick = () => startSearchingUX();
-    searchEl?.addEventListener("click", onSearchClick, true);
-
-    // 4) Снимаем плашку, когда в #tpwl-tickets появился контент
+    // 3) Снимаем плашку, когда в #tpwl-tickets появился контент
     const ticketsEl = document.getElementById("tpwl-tickets");
     let ticketsObserver: MutationObserver | null = null;
     if (ticketsEl) {
@@ -136,7 +137,6 @@ export default function SearchWidget() {
       script.remove();
       observer?.disconnect();
       ticketsObserver?.disconnect();
-      searchEl?.removeEventListener("click", onSearchClick, true);
       window.fetch = origFetch;
       XMLHttpRequest.prototype.open = origXhrOpen;
       if (searchingTimer.current) clearTimeout(searchingTimer.current);
