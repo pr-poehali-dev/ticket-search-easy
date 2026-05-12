@@ -57,13 +57,26 @@ export default function Sovety() {
       .finally(() => setPricesLoading(false));
   }, []);
 
-  const goSearch = (city: string) => {
+  const monthToNum: Record<string, string> = {
+    январь: "01", февраль: "02", март: "03", апрель: "04",
+    май: "05", июнь: "06", июль: "07", август: "08",
+    сентябрь: "09", октябрь: "10", ноябрь: "11", декабрь: "12",
+  };
+
+  const goSearch = (city: string, iata?: string, month?: string) => {
     if (navigator.clipboard) {
       navigator.clipboard.writeText(city).catch(() => {});
     }
     setCopiedCity(city);
-    setTimeout(() => setCopiedCity(null), 1800);
-    setTimeout(() => navigate("/"), 600);
+
+    const params = new URLSearchParams();
+    params.set("to", city);
+    if (iata) params.set("iata", iata);
+    if (month && monthToNum[month.toLowerCase()]) {
+      params.set("month", monthToNum[month.toLowerCase()]);
+    }
+
+    setTimeout(() => navigate(`/?${params.toString()}`), 600);
   };
 
   return (
@@ -220,10 +233,14 @@ export default function Sovety() {
                   </div>
                 )}
 
-                {/* Ценник */}
+                {/* Ценник — кликабельный */}
                 {price && (
-                  <div className="absolute top-14 right-5 z-10 animate-fade-in">
-                    <div className="bg-gradient-to-br from-[#c97a2b] to-[#a8631f] text-white rounded-2xl px-3 py-2 shadow-2xl border border-white/20 backdrop-blur-sm">
+                  <button
+                    onClick={() => goSearch(story.city, story.iata, price.month)}
+                    aria-label={`Найти билеты от ${formatPrice(price.price)}`}
+                    className="absolute top-14 right-5 z-10 animate-fade-in group/price"
+                  >
+                    <div className="bg-gradient-to-br from-[#c97a2b] to-[#a8631f] text-white rounded-2xl px-3 py-2 shadow-2xl border border-white/20 backdrop-blur-sm transition-transform group-hover/price:scale-105 group-hover/price:-rotate-2">
                       <div className="text-[8px] tracking-[0.2em] uppercase text-white/70 font-['IBM_Plex_Mono'] leading-none mb-0.5">
                         от
                       </div>
@@ -236,7 +253,7 @@ export default function Sovety() {
                         </div>
                       )}
                     </div>
-                  </div>
+                  </button>
                 )}
                 {!price && story.iata && pricesLoading && (
                   <div className="absolute top-14 right-5 z-10">
@@ -282,7 +299,7 @@ export default function Sovety() {
 
                   <div className="mt-auto flex items-center gap-2 flex-wrap">
                     <button
-                      onClick={() => goSearch(story.city)}
+                      onClick={() => goSearch(story.city, story.iata, price?.month)}
                       className="bg-white text-[#111] text-sm font-semibold px-4 py-2 rounded-full hover:bg-[#f5efe3] transition-all flex items-center gap-1.5 shadow-lg"
                     >
                       {copiedCity === story.city ? (
