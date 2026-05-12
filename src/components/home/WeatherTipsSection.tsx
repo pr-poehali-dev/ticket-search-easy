@@ -51,26 +51,80 @@ export default function WeatherTipsSection() {
   const [weather, setWeather] = useState<WeatherSpot[]>(fallbackWeather);
   const [weatherLoading, setWeatherLoading] = useState(true);
   const [insuranceOpen, setInsuranceOpen] = useState(false);
+  const [iframeHeight, setIframeHeight] = useState(560);
   const iframeRef = useRef<HTMLIFrameElement>(null);
 
   useEffect(() => {
-    if (!insuranceOpen || !iframeRef.current) return;
+    if (!insuranceOpen) {
+      setIframeHeight(560);
+      return;
+    }
     const iframe = iframeRef.current;
-    const doc = iframe.contentDocument;
-    if (!doc) return;
-    const closeTag = "</" + "script>";
-    const html =
-      '<!DOCTYPE html><html><head><meta charset="utf-8">' +
-      '<meta name="viewport" content="width=device-width,initial-scale=1">' +
-      "<style>html,body{margin:0;padding:0;background:transparent;" +
-      'font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;}</style>' +
-      "</head><body>" +
-      '<script async charset="utf-8" src="https://tpemd.com/content?trs=527526&shmarker=727110&destinations=shengen&color1=%237B9D52ff&color2=%237B9D52ff&powered_by=false&campaign_id=49&promo_id=4319">' +
-      closeTag +
-      "</body></html>";
-    doc.open();
-    doc.write(html);
-    doc.close();
+    if (!iframe) return;
+
+    const writeWidget = () => {
+      const doc = iframe.contentDocument;
+      const win = iframe.contentWindow;
+      if (!doc || !win) return;
+
+      doc.open();
+      doc.write(
+        '<!DOCTYPE html><html><head><meta charset="utf-8">' +
+          '<meta name="viewport" content="width=device-width,initial-scale=1">' +
+          "<style>html,body{margin:0;padding:0;background:transparent;" +
+          'font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;}' +
+          "*{box-sizing:border-box;}</style>" +
+          "</head><body><div id=\"tp-mount\"></div></body></html>",
+      );
+      doc.close();
+
+      const mount = doc.getElementById("tp-mount");
+      if (!mount) return;
+      const script = doc.createElement("script");
+      script.async = true;
+      script.charset = "utf-8";
+      script.src =
+        "https://tpemd.com/content?trs=527526&shmarker=727110&destinations=shengen&color1=%237B9D52ff&color2=%237B9D52ff&powered_by=false&campaign_id=49&promo_id=4319";
+      mount.appendChild(script);
+
+      const measure = () => {
+        const body = doc.body;
+        const root = doc.documentElement;
+        if (!body || !root) return;
+        const h = Math.max(
+          body.scrollHeight,
+          body.offsetHeight,
+          root.scrollHeight,
+          root.offsetHeight,
+        );
+        if (h > 0) setIframeHeight(h + 24);
+      };
+
+      let observer: ResizeObserver | null = null;
+      if (typeof win.ResizeObserver !== "undefined") {
+        observer = new win.ResizeObserver(() => measure());
+        observer.observe(doc.body);
+        observer.observe(doc.documentElement);
+      }
+      const interval = win.setInterval(measure, 600);
+      win.setTimeout(measure, 200);
+      win.setTimeout(measure, 1500);
+      win.setTimeout(measure, 3500);
+
+      iframe.dataset.cleanup = "1";
+      (iframe as unknown as { __cleanup?: () => void }).__cleanup = () => {
+        if (observer) observer.disconnect();
+        win.clearInterval(interval);
+      };
+    };
+
+    writeWidget();
+
+    return () => {
+      const cleanup = (iframe as unknown as { __cleanup?: () => void })
+        .__cleanup;
+      if (cleanup) cleanup();
+    };
   }, [insuranceOpen]);
 
   useEffect(() => {
@@ -193,7 +247,7 @@ export default function WeatherTipsSection() {
       </section>
 
       <Dialog open={insuranceOpen} onOpenChange={setInsuranceOpen}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-3xl max-h-[92vh] overflow-y-auto p-6">
           <DialogHeader>
             <DialogTitle className="text-2xl font-bold text-[#111]">
               Туристическая страховка
@@ -206,7 +260,9 @@ export default function WeatherTipsSection() {
           <iframe
             ref={iframeRef}
             title="Подбор страховки"
-            className="w-full min-h-[520px] border-0 mt-2 bg-transparent"
+            sandbox="allow-scripts allow-forms allow-popups allow-same-origin allow-top-navigation"
+            className="w-full border-0 mt-2 bg-transparent block"
+            style={{ height: iframeHeight }}
           />
         </DialogContent>
       </Dialog>
