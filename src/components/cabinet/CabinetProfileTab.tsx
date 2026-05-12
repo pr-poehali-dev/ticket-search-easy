@@ -1,4 +1,6 @@
 import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
+import Icon from "@/components/ui/icon";
 import { useAuth, type PassengerProfile } from "@/hooks/useAuth";
 
 export default function CabinetProfileTab() {
@@ -79,6 +81,17 @@ export default function CabinetProfileTab() {
         <h3 className="text-sm font-semibold text-[#111] uppercase tracking-wider font-['IBM_Plex_Mono']">
           Документ
         </h3>
+        <div className="bg-[#fff7e6] border border-[#e8d9b8] rounded-xl p-3 flex gap-2 items-start text-xs text-[#7a5a00] leading-relaxed">
+          <Icon name="ShieldAlert" size={14} className="mt-0.5 flex-shrink-0" />
+          <span>
+            Паспортные данные — особая категория персональных данных. Они нужны исключительно
+            для оформления авиабилетов, хранятся на серверах в РФ и обрабатываются согласно{" "}
+            <Link to="/privacy" target="_blank" className="underline hover:text-[#111]">
+              Политике конфиденциальности
+            </Link>
+            . Заполнение этого блока — добровольное.
+          </span>
+        </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {field("passport_series", "Серия паспорта", "1234")}
           {field("passport_number", "Номер паспорта", "567890")}
