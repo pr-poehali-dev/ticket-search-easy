@@ -88,7 +88,7 @@ export default function NewsSection() {
   }, []);
 
   return (
-    <section className="px-6 pb-12 max-w-6xl mx-auto">
+    <section className="px-6 pb-12 max-w-4xl mx-auto">
       <div className="flex items-end justify-between mb-6">
         <h2 className="text-sm font-medium tracking-[0.15em] uppercase text-[#8a8a8a] font-['IBM_Plex_Mono']">
           Новости для путешественников
@@ -117,23 +117,25 @@ export default function NewsSection() {
             <Wrap
               key={item.title}
               {...wrapProps}
-              className="bg-white border border-[#e8e8e6] rounded-2xl p-5 hover:border-[#111] transition-all cursor-pointer group flex flex-col"
+              className="bg-white border border-[#e8e8e6] rounded-2xl p-4 hover:border-[#111] transition-all cursor-pointer group flex flex-col"
             >
-              <div className="flex items-center justify-between mb-4">
-                <span className="text-[10px] tracking-[0.15em] font-['IBM_Plex_Mono'] text-[#7B9D52] bg-[#7B9D52]/10 px-2 py-1 rounded">
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-[9px] tracking-[0.15em] font-['IBM_Plex_Mono'] text-[#7B9D52] bg-[#7B9D52]/10 px-2 py-1 rounded">
                   {item.tag}
                 </span>
                 <Icon
                   name={item.icon}
-                  size={16}
+                  size={14}
                   className="text-[#c0c0bc] group-hover:text-[#111] transition-colors"
                 />
               </div>
-              <h3 className="text-base font-semibold text-[#111] leading-snug mb-2">
+              <h3 className="text-sm font-semibold text-[#111] leading-snug mb-2">
                 {item.title}
               </h3>
-              <p className="text-sm text-[#8a8a8a] flex-1">{item.desc}</p>
-              <div className="flex items-center gap-2 mt-4 pt-4 border-t border-[#f0f0ee]">
+              <p className="text-xs text-[#8a8a8a] flex-1 leading-relaxed">
+                {item.desc}
+              </p>
+              <div className="flex items-center gap-2 mt-3 pt-3 border-t border-[#f0f0ee]">
                 <span className="text-[10px] text-[#c0c0bc] font-['IBM_Plex_Mono']">
                   {item.date}
                 </span>
