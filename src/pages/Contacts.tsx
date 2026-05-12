@@ -1,16 +1,67 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import Icon from "@/components/ui/icon";
+import { useAuth } from "@/hooks/useAuth";
+import { ticketsApi } from "@/hooks/useTickets";
+
+const DEPARTMENTS = [
+  "Общие вопросы",
+  "Бронирование и билеты",
+  "Возврат и обмен",
+  "Страхование",
+  "Технические проблемы",
+  "Сотрудничество",
+  "Жалобы и предложения",
+];
 
 export default function Contacts() {
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
+  const { user, loading } = useAuth();
+  const [subject, setSubject] = useState("");
+  const [department, setDepartment] = useState(DEPARTMENTS[0]);
+  const [city, setCity] = useState("");
+  const [phone, setPhone] = useState("");
+  const [position, setPosition] = useState("");
   const [message, setMessage] = useState("");
-  const [sent, setSent] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [createdId, setCreatedId] = useState<number | null>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSent(true);
+    if (!user) return;
+    setSubmitting(true);
+    setError(null);
+    try {
+      const res = await ticketsApi.create({
+        subject,
+        message,
+        department,
+        city,
+        contact_phone: phone || user.phone || "",
+        contact_email: user.email,
+        contact_position: position,
+      });
+      setCreatedId(res.ticket.id);
+      setSubject("");
+      setCity("");
+      setPhone("");
+      setPosition("");
+      setMessage("");
+      setDepartment(DEPARTMENTS[0]);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Не удалось отправить");
+    } finally {
+      setSubmitting(false);
+    }
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[#f7f7f6] flex items-center justify-center">
+        <div className="text-[#8a8a8a]">Загрузка…</div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#f7f7f6]">
@@ -27,19 +78,53 @@ export default function Contacts() {
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-8 animate-fade-in">
           {/* Form */}
           <div className="lg:col-span-3">
-            {sent ? (
+            {!user ? (
+              <div className="bg-white border border-[#e8e8e6] rounded-2xl p-10 text-center">
+                <div className="w-14 h-14 bg-[#fff7e6] rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Icon name="Lock" size={24} className="text-[#b07b00]" />
+                </div>
+                <h3 className="text-lg font-semibold text-[#111] mb-2">
+                  Войдите, чтобы отправить обращение
+                </h3>
+                <p className="text-sm text-[#8a8a8a] mb-5">
+                  Так мы сможем сохранить переписку у вас в личном кабинете
+                  и отправить ответ.
+                </p>
+                <Link
+                  to="/cabinet"
+                  className="inline-flex items-center gap-2 bg-[#7B9D52] text-white px-5 py-3 rounded-xl text-sm font-semibold hover:bg-[#6b8a47] transition-colors"
+                >
+                  <Icon name="LogIn" size={16} />
+                  Войти или зарегистрироваться
+                </Link>
+              </div>
+            ) : createdId ? (
               <div className="bg-white border border-[#e8e8e6] rounded-2xl p-10 text-center">
                 <div className="w-14 h-14 bg-[#e8f5e9] rounded-full flex items-center justify-center mx-auto mb-4">
                   <Icon name="Check" size={24} className="text-[#2e7d32]" />
                 </div>
-                <h3 className="text-lg font-semibold text-[#111] mb-2">Сообщение отправлено</h3>
-                <p className="text-sm text-[#8a8a8a]">Мы ответим вам в течение нескольких часов</p>
-                <button
-                  onClick={() => { setSent(false); setName(""); setEmail(""); setMessage(""); }}
-                  className="mt-6 text-sm font-medium text-[#111] underline underline-offset-4"
-                >
-                  Отправить ещё одно
-                </button>
+                <h3 className="text-lg font-semibold text-[#111] mb-2">
+                  Обращение №{createdId} принято
+                </h3>
+                <p className="text-sm text-[#8a8a8a] mb-5">
+                  Переписку и ответ вы найдёте в личном кабинете во вкладке
+                  «Обращения».
+                </p>
+                <div className="flex gap-3 justify-center">
+                  <Link
+                    to="/cabinet?tab=tickets"
+                    className="inline-flex items-center gap-2 bg-[#111] text-white px-5 py-3 rounded-xl text-sm font-semibold hover:bg-[#333] transition-colors"
+                  >
+                    <Icon name="Inbox" size={16} />
+                    Открыть мои обращения
+                  </Link>
+                  <button
+                    onClick={() => setCreatedId(null)}
+                    className="text-sm font-medium text-[#111] underline underline-offset-4"
+                  >
+                    Отправить ещё одно
+                  </button>
+                </div>
               </div>
             ) : (
               <form
@@ -49,31 +134,72 @@ export default function Contacts() {
                 <h3 className="text-sm font-semibold text-[#111] uppercase tracking-wider font-['IBM_Plex_Mono'] mb-2">
                   Обратная связь
                 </h3>
+
                 <div>
                   <label className="text-xs text-[#8a8a8a] uppercase tracking-wider font-['IBM_Plex_Mono'] font-medium block mb-1.5">
-                    Ваше имя
+                    Подразделение
+                  </label>
+                  <select
+                    value={department}
+                    onChange={(e) => setDepartment(e.target.value)}
+                    className="w-full border border-[#e8e8e6] rounded-xl px-4 py-3 text-sm text-[#111] bg-white focus:outline-none focus:border-[#111] transition-colors"
+                  >
+                    {DEPARTMENTS.map((d) => (
+                      <option key={d} value={d}>{d}</option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="text-xs text-[#8a8a8a] uppercase tracking-wider font-['IBM_Plex_Mono'] font-medium block mb-1.5">
+                    Тема обращения
                   </label>
                   <input
                     required
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    placeholder="Иван Петров"
+                    value={subject}
+                    onChange={(e) => setSubject(e.target.value)}
+                    placeholder="Кратко суть"
                     className="w-full border border-[#e8e8e6] rounded-xl px-4 py-3 text-sm text-[#111] placeholder:text-[#c0c0bc] focus:outline-none focus:border-[#111] transition-colors"
                   />
                 </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-xs text-[#8a8a8a] uppercase tracking-wider font-['IBM_Plex_Mono'] font-medium block mb-1.5">
+                      Город
+                    </label>
+                    <input
+                      value={city}
+                      onChange={(e) => setCity(e.target.value)}
+                      placeholder="Москва"
+                      className="w-full border border-[#e8e8e6] rounded-xl px-4 py-3 text-sm text-[#111] placeholder:text-[#c0c0bc] focus:outline-none focus:border-[#111] transition-colors"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs text-[#8a8a8a] uppercase tracking-wider font-['IBM_Plex_Mono'] font-medium block mb-1.5">
+                      Телефон
+                    </label>
+                    <input
+                      value={phone}
+                      onChange={(e) => setPhone(e.target.value)}
+                      placeholder="+7 999 000-00-00"
+                      className="w-full border border-[#e8e8e6] rounded-xl px-4 py-3 text-sm text-[#111] placeholder:text-[#c0c0bc] focus:outline-none focus:border-[#111] transition-colors"
+                    />
+                  </div>
+                </div>
+
                 <div>
                   <label className="text-xs text-[#8a8a8a] uppercase tracking-wider font-['IBM_Plex_Mono'] font-medium block mb-1.5">
-                    Email
+                    Должность / пост (опционально)
                   </label>
                   <input
-                    required
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="ivan@mail.ru"
+                    value={position}
+                    onChange={(e) => setPosition(e.target.value)}
+                    placeholder="Например, директор по продажам"
                     className="w-full border border-[#e8e8e6] rounded-xl px-4 py-3 text-sm text-[#111] placeholder:text-[#c0c0bc] focus:outline-none focus:border-[#111] transition-colors"
                   />
                 </div>
+
                 <div>
                   <label className="text-xs text-[#8a8a8a] uppercase tracking-wider font-['IBM_Plex_Mono'] font-medium block mb-1.5">
                     Сообщение
@@ -87,12 +213,23 @@ export default function Contacts() {
                     className="w-full border border-[#e8e8e6] rounded-xl px-4 py-3 text-sm text-[#111] placeholder:text-[#c0c0bc] focus:outline-none focus:border-[#111] transition-colors resize-none"
                   />
                 </div>
+
+                {error && (
+                  <p className="text-sm text-red-600">{error}</p>
+                )}
+
                 <button
                   type="submit"
-                  className="w-full bg-[#111] text-white py-3 rounded-xl text-sm font-semibold hover:bg-[#333] transition-colors"
+                  disabled={submitting}
+                  className="w-full bg-[#111] text-white py-3 rounded-xl text-sm font-semibold hover:bg-[#333] transition-colors disabled:opacity-50"
                 >
-                  Отправить
+                  {submitting ? "Отправляем…" : "Отправить обращение"}
                 </button>
+
+                <p className="text-xs text-[#8a8a8a] text-center">
+                  Вы войдёте как <span className="font-medium text-[#111]">{user.email}</span>.
+                  Ответ придёт в личный кабинет.
+                </p>
               </form>
             )}
           </div>

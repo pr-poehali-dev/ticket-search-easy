@@ -1,15 +1,34 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import Icon from "@/components/ui/icon";
 import { useAuth } from "@/hooks/useAuth";
+import { isAdminEmail } from "@/hooks/useTickets";
 import CabinetAuthForm from "@/components/cabinet/CabinetAuthForm";
 import CabinetProfileTab from "@/components/cabinet/CabinetProfileTab";
 import CabinetPassportTab from "@/components/cabinet/CabinetPassportTab";
+import CabinetTicketsTab from "@/components/cabinet/CabinetTicketsTab";
+import CabinetAdminTab from "@/components/cabinet/CabinetAdminTab";
 
-type Tab = "profile" | "passport";
+type Tab = "profile" | "passport" | "tickets" | "admin";
 
 export default function Cabinet() {
   const { user, loading, logout } = useAuth();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [tab, setTab] = useState<Tab>("profile");
+
+  const admin = isAdminEmail(user?.email);
+
+  useEffect(() => {
+    const t = searchParams.get("tab") as Tab | null;
+    if (t === "tickets" || t === "passport" || t === "profile" || (t === "admin" && admin)) {
+      setTab(t);
+    }
+  }, [searchParams, admin]);
+
+  const changeTab = (t: Tab) => {
+    setTab(t);
+    setSearchParams({ tab: t }, { replace: true });
+  };
 
   if (loading) {
     return (
@@ -27,7 +46,18 @@ export default function Cabinet() {
     );
   }
 
-  const initials = `${user.first_name?.[0] || ""}${user.last_name?.[0] || ""}`.toUpperCase() || user.email[0].toUpperCase();
+  const initials =
+    `${user.first_name?.[0] || ""}${user.last_name?.[0] || ""}`.toUpperCase() ||
+    user.email[0].toUpperCase();
+
+  const tabs: [Tab, string, string][] = [
+    ["profile", "Профиль пассажира", "User"],
+    ["passport", "Паспорт путешественника", "MapPin"],
+    ["tickets", "Обращения", "MessageSquare"],
+  ];
+  if (admin) {
+    tabs.push(["admin", "Администрирование", "ShieldCheck"]);
+  }
 
   return (
     <div className="min-h-screen bg-[#e5e5e3]">
@@ -55,29 +85,38 @@ export default function Cabinet() {
         </div>
 
         {/* Tabs */}
-        <div className="flex gap-1 bg-white/60 rounded-xl p-1 w-fit mb-8 border border-[#e8e8e6]">
-          {([
-            ["profile", "Профиль пассажира", "User"],
-            ["passport", "Паспорт путешественника", "MapPin"],
-          ] as [Tab, string, string][]).map(([key, label, icon]) => (
+        <div className="flex gap-1 bg-white/60 rounded-xl p-1 mb-8 border border-[#e8e8e6] overflow-x-auto">
+          {tabs.map(([key, label, icon]) => (
             <button
               key={key}
-              onClick={() => setTab(key)}
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+              onClick={() => changeTab(key)}
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all whitespace-nowrap ${
                 tab === key
-                  ? "bg-[#7B9D52] text-white shadow-sm"
+                  ? key === "admin"
+                    ? "bg-[#111] text-white shadow-sm"
+                    : "bg-[#7B9D52] text-white shadow-sm"
                   : "text-[#8a8a8a] hover:text-[#111]"
               }`}
             >
               <Icon name={icon} size={14} />
               <span className="hidden sm:inline">{label}</span>
-              <span className="sm:hidden">{key === "profile" ? "Профиль" : "Паспорт"}</span>
+              <span className="sm:hidden">
+                {key === "profile"
+                  ? "Профиль"
+                  : key === "passport"
+                  ? "Паспорт"
+                  : key === "tickets"
+                  ? "Обращения"
+                  : "Админ"}
+              </span>
             </button>
           ))}
         </div>
 
         {tab === "profile" && <CabinetProfileTab />}
         {tab === "passport" && <CabinetPassportTab />}
+        {tab === "tickets" && <CabinetTicketsTab />}
+        {tab === "admin" && admin && <CabinetAdminTab />}
       </div>
     </div>
   );
