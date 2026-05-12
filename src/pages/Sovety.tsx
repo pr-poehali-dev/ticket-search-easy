@@ -221,47 +221,45 @@ export default function Sovety() {
                   </div>
                 )}
 
-                {/* Ценник — кликабельный */}
-                {price && (
-                  <button
-                    onClick={() => goSearch(story.city)}
-                    aria-label={`Найти билеты от ${formatPrice(price.price)}`}
-                    className="absolute top-14 right-5 z-10 animate-fade-in group/price"
-                  >
-                    <div className="bg-gradient-to-br from-[#c97a2b] to-[#a8631f] text-white rounded-2xl px-3 py-2 shadow-2xl border border-white/20 backdrop-blur-sm transition-transform group-hover/price:scale-105 group-hover/price:-rotate-2">
-                      <div className="text-[8px] tracking-[0.2em] uppercase text-white/70 font-['IBM_Plex_Mono'] leading-none mb-0.5">
-                        от
-                      </div>
-                      <div className="text-base font-bold leading-none whitespace-nowrap">
-                        {formatPrice(price.price)}
-                      </div>
-                      {price.month && (
-                        <div className="text-[9px] text-white/80 mt-0.5 capitalize leading-none">
-                          {price.month}
-                        </div>
-                      )}
-                    </div>
-                  </button>
-                )}
-                {!price && story.iata && pricesLoading && (
-                  <div className="absolute top-14 right-5 z-10">
-                    <div className="bg-white/10 backdrop-blur-sm rounded-2xl px-3 py-2 border border-white/15">
-                      <div className="w-12 h-3 bg-white/20 rounded animate-pulse" />
-                    </div>
-                  </div>
-                )}
-
                 <div className="relative p-6 pt-44 sm:pt-56 flex flex-col min-h-[420px]">
                   {/* эмоджи */}
                   <div className="absolute top-20 right-6 text-6xl opacity-90 transition-transform duration-500 group-hover:scale-110 group-hover:-rotate-6">
                     {story.emoji}
                   </div>
 
-                  <div className="inline-flex items-center gap-1.5 bg-white/10 backdrop-blur-sm px-2.5 py-1 rounded-full border border-white/15 self-start mb-3">
-                    <Icon name="MapPin" size={11} className="text-[#c97a2b]" />
-                    <span className="text-[11px] text-white/85 font-medium">
-                      {story.tag}
-                    </span>
+                  <div className="flex items-center gap-2 mb-3 flex-wrap">
+                    <div className="inline-flex items-center gap-1.5 bg-white/10 backdrop-blur-sm px-2.5 py-1 rounded-full border border-white/15">
+                      <Icon name="MapPin" size={11} className="text-[#c97a2b]" />
+                      <span className="text-[11px] text-white/85 font-medium">
+                        {story.tag}
+                      </span>
+                    </div>
+
+                    {/* Ценник — рядом с тегом */}
+                    {price && (
+                      <button
+                        onClick={() => goSearch(story.city)}
+                        aria-label={`Найти билеты от ${formatPrice(price.price)}`}
+                        className="inline-flex items-baseline gap-1 bg-gradient-to-br from-[#c97a2b] to-[#a8631f] text-white px-2.5 py-1 rounded-full border border-white/20 shadow-lg hover:scale-105 transition-transform"
+                      >
+                        <span className="text-[9px] tracking-[0.15em] uppercase text-white/75 font-['IBM_Plex_Mono'] font-medium">
+                          от
+                        </span>
+                        <span className="text-[12px] font-bold leading-none whitespace-nowrap">
+                          {formatPrice(price.price)}
+                        </span>
+                        {price.month && (
+                          <span className="text-[9px] text-white/75 capitalize leading-none">
+                            · {price.month}
+                          </span>
+                        )}
+                      </button>
+                    )}
+                    {!price && story.iata && pricesLoading && (
+                      <div className="bg-white/10 backdrop-blur-sm rounded-full px-3 py-1 border border-white/15">
+                        <div className="w-14 h-2.5 bg-white/20 rounded animate-pulse" />
+                      </div>
+                    )}
                   </div>
 
                   <h3 className="text-white text-2xl font-semibold leading-tight mb-1">
