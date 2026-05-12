@@ -1,0 +1,22 @@
+{
+  "tests": [
+    {
+      "name": "OPTIONS preflight",
+      "method": "OPTIONS",
+      "path": "/",
+      "expectedStatus": 200
+    },
+    {
+      "name": "GET без destinations возвращает 400",
+      "method": "GET",
+      "path": "/",
+      "expectedStatus": 400
+    },
+    {
+      "name": "GET с одним направлением",
+      "method": "GET",
+      "path": "/?destinations=KZN",
+      "expectedStatus": 200
+    }
+  ]
+}

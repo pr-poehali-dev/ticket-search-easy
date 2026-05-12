@@ -6,13 +6,22 @@ import { MASCOT_STORIES } from "@/data/mascotStories";
 const MASCOT_IMG =
   "https://cdn.poehali.dev/projects/deb6d332-2cc4-4c3a-bcd1-e4e0a738361b/files/d5ad73a9-40a6-498d-b605-f7b4722a5c01.jpg";
 
+const PRICES_URL =
+  "https://functions.poehali.dev/6f273ff8-63ba-4314-9b24-8b61b3901f87";
+
+type PriceInfo = { price: number; month: string };
 type Filter = "all" | string;
+
+const formatPrice = (n: number) =>
+  new Intl.NumberFormat("ru-RU").format(n) + " ₽";
 
 export default function Sovety() {
   const navigate = useNavigate();
   const [filter, setFilter] = useState<Filter>("all");
   const [openId, setOpenId] = useState<number | null>(null);
   const [copiedCity, setCopiedCity] = useState<string | null>(null);
+  const [prices, setPrices] = useState<Record<string, PriceInfo>>({});
+  const [pricesLoading, setPricesLoading] = useState(true);
 
   const tags = useMemo(() => {
     const set = new Set(MASCOT_STORIES.map((s) => s.tag));
@@ -29,6 +38,23 @@ export default function Sovety() {
 
   useEffect(() => {
     document.title = "Советы Гоши — путешествия по России | КОМПАС";
+  }, []);
+
+  useEffect(() => {
+    const iatas = Array.from(
+      new Set(
+        MASCOT_STORIES.map((s) => s.iata).filter((x): x is string => Boolean(x)),
+      ),
+    );
+    if (iatas.length === 0) return;
+
+    fetch(`${PRICES_URL}?destinations=${iatas.join(",")}`)
+      .then((r) => r.json())
+      .then((d) => {
+        if (d?.prices) setPrices(d.prices);
+      })
+      .catch(() => {})
+      .finally(() => setPricesLoading(false));
   }, []);
 
   const goSearch = (city: string) => {
@@ -104,6 +130,17 @@ export default function Sovety() {
                 <Stat value={MASCOT_STORIES.length} label="Направлений" />
                 <Stat value={tags.length} label="Регионов" />
                 <Stat value="11" label="Часовых поясов" />
+                {(() => {
+                  const list = Object.values(prices);
+                  if (list.length === 0) return null;
+                  const min = Math.min(...list.map((p) => p.price));
+                  return (
+                    <Stat
+                      value={`от ${formatPrice(min)}`}
+                      label="Билет в одну сторону"
+                    />
+                  );
+                })()}
               </div>
             </div>
           </div>
@@ -153,6 +190,7 @@ export default function Sovety() {
           {visible.map((story, i) => {
             const id = MASCOT_STORIES.indexOf(story);
             const isOpen = openId === id;
+            const price = story.iata ? prices[story.iata] : undefined;
             return (
               <article
                 key={story.tag + i}
@@ -179,6 +217,32 @@ export default function Sovety() {
                     <span className="text-[11px] font-bold text-white bg-white/15 backdrop-blur-md px-2.5 py-1 rounded-full border border-white/20 font-['IBM_Plex_Mono']">
                       {story.iata}
                     </span>
+                  </div>
+                )}
+
+                {/* Ценник */}
+                {price && (
+                  <div className="absolute top-14 right-5 z-10 animate-fade-in">
+                    <div className="bg-gradient-to-br from-[#c97a2b] to-[#a8631f] text-white rounded-2xl px-3 py-2 shadow-2xl border border-white/20 backdrop-blur-sm">
+                      <div className="text-[8px] tracking-[0.2em] uppercase text-white/70 font-['IBM_Plex_Mono'] leading-none mb-0.5">
+                        от
+                      </div>
+                      <div className="text-base font-bold leading-none whitespace-nowrap">
+                        {formatPrice(price.price)}
+                      </div>
+                      {price.month && (
+                        <div className="text-[9px] text-white/80 mt-0.5 capitalize leading-none">
+                          {price.month}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+                {!price && story.iata && pricesLoading && (
+                  <div className="absolute top-14 right-5 z-10">
+                    <div className="bg-white/10 backdrop-blur-sm rounded-2xl px-3 py-2 border border-white/15">
+                      <div className="w-12 h-3 bg-white/20 rounded animate-pulse" />
+                    </div>
                   </div>
                 )}
 
@@ -225,6 +289,11 @@ export default function Sovety() {
                         <>
                           <Icon name="Check" size={13} className="text-[#7B9D52]" />
                           Открываю поиск
+                        </>
+                      ) : price ? (
+                        <>
+                          <Icon name="Plane" size={13} />
+                          От {formatPrice(price.price)}
                         </>
                       ) : (
                         <>
