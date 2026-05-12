@@ -1,4 +1,5 @@
 import json
+import re
 import urllib.request
 import xml.etree.ElementTree as ET
 from datetime import datetime
@@ -6,9 +7,9 @@ from email.utils import parsedate_to_datetime
 
 
 RSS_FEEDS = [
-    ("Авиация", "https://www.aviaport.ru/export/rss/news/"),
-    ("Туризм", "https://www.atorus.ru/rss.xml"),
-    ("Путешествия", "https://www.tourdom.ru/rss/news.xml"),
+    ("Путешествия", "https://lenta.ru/rss/news/travel"),
+    ("Туризм", "https://tass.ru/turizm/rss.xml"),
+    ("Авиация", "https://tass.ru/transport/rss.xml"),
 ]
 
 ICON_BY_TAG = {
@@ -24,16 +25,48 @@ CORS_HEADERS = {
     "Access-Control-Allow-Methods": "GET, OPTIONS",
     "Access-Control-Allow-Headers": "Content-Type",
     "Content-Type": "application/json; charset=utf-8",
+    "Cache-Control": "no-store, no-cache, must-revalidate",
 }
 
 
-def fetch_feed(url: str, timeout: int = 6):
-    req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
+def fetch_feed(url: str, timeout: int = 6) -> bytes:
+    req = urllib.request.Request(
+        url,
+        headers={
+            "User-Agent": "Mozilla/5.0 (compatible; TravelNewsBot/1.0)",
+            "Accept": "application/rss+xml, application/xml, text/xml, */*",
+            "Accept-Language": "ru,en;q=0.8",
+        },
+    )
     with urllib.request.urlopen(req, timeout=timeout) as resp:
         return resp.read()
 
 
-def parse_rss(xml_bytes: bytes, tag: str, limit: int = 3):
+def strip_html(text: str) -> str:
+    if not text:
+        return ""
+    text = re.sub(r"<[^>]+>", "", text)
+    text = text.replace("&nbsp;", " ").replace("&amp;", "&")
+    text = text.replace("&quot;", '"').replace("&laquo;", '"').replace("&raquo;", '"')
+    text = text.replace("&mdash;", "—").replace("&ndash;", "–")
+    text = re.sub(r"\s+", " ", text).strip()
+    return text
+
+
+def detect_tag(title: str, default_tag: str) -> str:
+    t = title.lower()
+    if any(k in t for k in ["виз", "безвиз", "паспорт"]):
+        return "Визы"
+    if any(k in t for k in ["аэропорт", "терминал", "шереметьев", "внуков", "пулков"]):
+        return "Аэропорты"
+    if any(k in t for k in ["рейс", "самолёт", "самолет", "авиа", "перелёт", "перелет", "авиакомпан"]):
+        return "Авиация"
+    if any(k in t for k in ["отель", "курорт", "пляж", "тур ", "туроператор", "путёвк", "путевк"]):
+        return "Туризм"
+    return default_tag
+
+
+def parse_rss(xml_bytes: bytes, default_tag: str, limit: int = 4):
     items = []
     try:
         root = ET.fromstring(xml_bytes)
@@ -46,24 +79,15 @@ def parse_rss(xml_bytes: bytes, tag: str, limit: int = 3):
         link_el = item.find("link")
         date_el = item.find("pubDate")
 
-        title = (title_el.text or "").strip() if title_el is not None else ""
-        desc_raw = (desc_el.text or "").strip() if desc_el is not None else ""
+        title = strip_html(title_el.text if title_el is not None else "")
+        desc = strip_html(desc_el.text if desc_el is not None else "")
         link = (link_el.text or "").strip() if link_el is not None else ""
 
-        desc = ""
-        if desc_raw:
-            in_tag = False
-            buf = []
-            for ch in desc_raw:
-                if ch == "<":
-                    in_tag = True
-                elif ch == ">":
-                    in_tag = False
-                elif not in_tag:
-                    buf.append(ch)
-            desc = "".join(buf).strip()
-            if len(desc) > 160:
-                desc = desc[:157].rstrip() + "..."
+        if not title:
+            continue
+
+        if len(desc) > 160:
+            desc = desc[:157].rstrip() + "..."
 
         date_str = ""
         if date_el is not None and date_el.text:
@@ -77,15 +101,15 @@ def parse_rss(xml_bytes: bytes, tag: str, limit: int = 3):
             except (TypeError, ValueError, IndexError):
                 date_str = ""
 
-        if title:
-            items.append({
-                "tag": tag.upper(),
-                "date": date_str,
-                "title": title,
-                "desc": desc,
-                "link": link,
-                "icon": ICON_BY_TAG.get(tag, "Newspaper"),
-            })
+        tag = detect_tag(title, default_tag)
+        items.append({
+            "tag": tag.upper(),
+            "date": date_str,
+            "title": title,
+            "desc": desc,
+            "link": link,
+            "icon": ICON_BY_TAG.get(tag, "Newspaper"),
+        })
         if len(items) >= limit:
             break
 
@@ -94,8 +118,8 @@ def parse_rss(xml_bytes: bytes, tag: str, limit: int = 3):
 
 def handler(event: dict, context) -> dict:
     """
-    Возвращает актуальные новости для путешественников из открытых RSS-источников.
-    GET /travel-news -> { news: [...] }
+    Свежие новости для путешественников: ТАСС (туризм/транспорт) + Лента.ру (путешествия).
+    GET -> { news: [...], updatedAt }
     """
     method = event.get("httpMethod", "GET")
 
@@ -111,11 +135,18 @@ def handler(event: dict, context) -> dict:
         }
 
     all_news = []
+    seen_titles = set()
+
     for tag, url in RSS_FEEDS:
         try:
             data = fetch_feed(url)
-            items = parse_rss(data, tag, limit=2)
-            all_news.extend(items)
+            items = parse_rss(data, tag, limit=4)
+            for it in items:
+                key = it["title"].lower()[:60]
+                if key in seen_titles:
+                    continue
+                seen_titles.add(key)
+                all_news.append(it)
         except Exception:
             continue
 
