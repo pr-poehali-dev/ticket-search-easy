@@ -20,7 +20,7 @@ export default function Cabinet() {
 
   useEffect(() => {
     const t = searchParams.get("tab") as Tab | null;
-    if (t === "tickets" || t === "passport" || t === "profile" || (t === "admin" && admin)) {
+    if (t === "passport" || t === "profile" || (t === "tickets" && !admin) || (t === "admin" && admin)) {
       setTab(t);
     }
   }, [searchParams, admin]);
@@ -53,8 +53,10 @@ export default function Cabinet() {
   const tabs: [Tab, string, string][] = [
     ["profile", "Профиль пассажира", "User"],
     ["passport", "Паспорт путешественника", "MapPin"],
-    ["tickets", "Обращения", "MessageSquare"],
   ];
+  if (!admin) {
+    tabs.push(["tickets", "Обращения", "MessageSquare"]);
+  }
   if (admin) {
     tabs.push(["admin", "Администрирование", "ShieldCheck"]);
   }
@@ -115,7 +117,7 @@ export default function Cabinet() {
 
         {tab === "profile" && <CabinetProfileTab />}
         {tab === "passport" && <CabinetPassportTab />}
-        {tab === "tickets" && <CabinetTicketsTab />}
+        {tab === "tickets" && !admin && <CabinetTicketsTab />}
         {tab === "admin" && admin && <CabinetAdminTab />}
       </div>
     </div>

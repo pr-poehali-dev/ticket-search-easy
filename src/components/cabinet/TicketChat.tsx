@@ -301,17 +301,27 @@ ${messagesHtml}
       <div ref={scrollRef} className="p-4 sm:p-5 space-y-3 max-h-[480px] overflow-y-auto bg-[#fafafa]">
         {messages.map((m) => {
           const mine = isAdmin ? m.author_role === "admin" : m.author_role === "user";
+          const isAi = m.author_role === "ai";
+          const label =
+            m.author_role === "admin"
+              ? "Администратор"
+              : m.author_role === "ai"
+              ? "Ассистент"
+              : "Пользователь";
           return (
             <div key={m.id} className={`flex ${mine ? "justify-end" : "justify-start"}`}>
               <div
                 className={`max-w-[80%] rounded-2xl px-4 py-2.5 ${
                   mine
                     ? "bg-[#7B9D52] text-white"
+                    : isAi
+                    ? "bg-[#f3efff] border border-[#d9cfff] text-[#111]"
                     : "bg-white border border-[#e8e8e6] text-[#111]"
                 }`}
               >
-                <div className={`text-[10px] uppercase tracking-wider mb-1 font-['IBM_Plex_Mono'] ${mine ? "text-white/70" : "text-[#8a8a8a]"}`}>
-                  {m.author_role === "admin" ? "Администратор" : "Пользователь"} ·{" "}
+                <div className={`text-[10px] uppercase tracking-wider mb-1 font-['IBM_Plex_Mono'] flex items-center gap-1 ${mine ? "text-white/70" : isAi ? "text-[#7a5af8]" : "text-[#8a8a8a]"}`}>
+                  {isAi && <Icon name="Sparkles" size={11} />}
+                  {label} ·{" "}
                   {new Date(m.created_at).toLocaleString("ru-RU", {
                     day: "2-digit",
                     month: "2-digit",

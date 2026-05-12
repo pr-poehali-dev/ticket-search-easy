@@ -1,6 +1,8 @@
 import json
 import os
 import re
+import urllib.request
+import urllib.error
 import psycopg2
 
 ADMIN_EMAIL = "centr.mol89@bk.ru"
@@ -165,6 +167,68 @@ def list_tickets(cur, user, params):
     ]
 
 
+def generate_ai_reply(subject: str, message: str, department: str, city: str, history: list) -> str:
+    api_key = os.environ.get("OPENAI_API_KEY", "").strip()
+    if not api_key:
+        return ""
+
+    system_prompt = (
+        "Ты — вежливый ассистент техподдержки сервиса по подбору авиабилетов и путешествий. "
+        "Отвечай по-русски, кратко (до 6 предложений), по делу. "
+        "Если вопрос требует действий администратора (возврат, изменение данных, спор) — "
+        "успокой пользователя и сообщи, что специалист подключится в ближайшее время. "
+        "Если можешь дать полезный совет (как искать билеты, что такое город, как пользоваться сервисом) — дай его. "
+        "Не выдумывай факты о бронированиях пользователя."
+    )
+
+    user_intro = (
+        f"Тема: {subject}\n"
+        f"Раздел: {department}\n"
+        + (f"Город: {city}\n" if city else "")
+        + f"\nСообщение пользователя:\n{message}"
+    )
+
+    messages = [{"role": "system", "content": system_prompt}]
+    for h in history:
+        role = "assistant" if h.get("author_role") in ("admin", "ai") else "user"
+        messages.append({"role": role, "content": h.get("body") or ""})
+    messages.append({"role": "user", "content": user_intro})
+
+    payload = json.dumps({
+        "model": "gpt-4o-mini",
+        "messages": messages,
+        "temperature": 0.4,
+        "max_tokens": 400,
+    }).encode("utf-8")
+
+    req = urllib.request.Request(
+        "https://api.openai.com/v1/chat/completions",
+        data=payload,
+        headers={
+            "Authorization": f"Bearer {api_key}",
+            "Content-Type": "application/json",
+        },
+        method="POST",
+    )
+    try:
+        with urllib.request.urlopen(req, timeout=25) as resp:
+            data = json.loads(resp.read().decode("utf-8"))
+        return (data.get("choices") or [{}])[0].get("message", {}).get("content", "").strip()
+    except Exception:
+        return ""
+
+
+def insert_ai_message(cur, ticket_id: int, text: str) -> None:
+    safe = text.replace("'", "''")
+    cur.execute(
+        f"INSERT INTO {SCHEMA}.ticket_messages (ticket_id, user_id, author_role, body) "
+        f"VALUES ({int(ticket_id)}, NULL, 'ai', '{safe}')"
+    )
+    cur.execute(
+        f"UPDATE {SCHEMA}.tickets SET updated_at = NOW() WHERE id = {int(ticket_id)}"
+    )
+
+
 def create_ticket(cur, conn, user, body):
     subject = safe_str(body.get("subject"), 300).strip()
     message = safe_str(body.get("message"), 5000).strip()
@@ -191,6 +255,11 @@ def create_ticket(cur, conn, user, body):
         f"VALUES ({int(ticket_id)}, {int(user['id'])}, 'user', '{safe_msg}')"
     )
     conn.commit()
+
+    ai_text = generate_ai_reply(subject, message, department, city, [])
+    if ai_text:
+        insert_ai_message(cur, ticket_id, ai_text)
+        conn.commit()
 
     ticket = fetch_ticket(cur, ticket_id)
     messages = fetch_messages(cur, ticket_id)
@@ -223,6 +292,19 @@ def post_message(cur, conn, user, ticket_id: int, body):
         f"UPDATE {SCHEMA}.tickets SET updated_at = NOW() WHERE id = {int(ticket_id)}"
     )
     conn.commit()
+
+    if not admin:
+        history = fetch_messages(cur, ticket_id)
+        ai_text = generate_ai_reply(
+            ticket.get("subject") or "",
+            text,
+            ticket.get("department") or "",
+            ticket.get("city") or "",
+            history,
+        )
+        if ai_text:
+            insert_ai_message(cur, ticket_id, ai_text)
+            conn.commit()
 
     return ok({
         "ticket": fetch_ticket(cur, ticket_id),
