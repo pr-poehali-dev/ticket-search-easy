@@ -124,13 +124,18 @@ def fetch_messages(cur, ticket_id: int):
 
 def list_tickets(cur, user, params):
     admin = is_admin(user)
-    where = ""
-    if not admin:
-        where = f"WHERE t.user_id = {int(user['id'])}"
-    else:
+    scope = ((params or {}).get("scope") or "").lower()
+    conditions = []
+
+    if not admin or scope == "mine":
+        conditions.append(f"t.user_id = {int(user['id'])}")
+
+    if admin and scope != "mine":
         status_filter = (params or {}).get("status")
         if status_filter in ("open", "closed"):
-            where = f"WHERE t.status = '{status_filter}'"
+            conditions.append(f"t.status = '{status_filter}'")
+
+    where = ("WHERE " + " AND ".join(conditions)) if conditions else ""
 
     cur.execute(
         f"SELECT t.id, t.user_id, t.subject, t.department, t.city, "

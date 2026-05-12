@@ -77,9 +77,12 @@ async function call(path: string, init?: RequestInit) {
 }
 
 export const ticketsApi = {
-  async list(status?: "open" | "closed"): Promise<TicketSummary[]> {
-    const q = status ? `&status=${status}` : "";
-    const data = await call(`?action=list${q}`);
+  async list(status?: "open" | "closed", scope?: "mine"): Promise<TicketSummary[]> {
+    const qs = [
+      status ? `status=${status}` : "",
+      scope ? `scope=${scope}` : "",
+    ].filter(Boolean).join("&");
+    const data = await call(`?action=list${qs ? `&${qs}` : ""}`);
     return data.tickets || [];
   },
 

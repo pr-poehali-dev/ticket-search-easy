@@ -12,7 +12,7 @@ export default function CabinetTicketsTab() {
 
   const load = async () => {
     try {
-      const list = await ticketsApi.list();
+      const list = await ticketsApi.list(undefined, "mine");
       setTickets(list);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Ошибка");
