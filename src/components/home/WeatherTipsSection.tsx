@@ -1,5 +1,12 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Icon from "@/components/ui/icon";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
 
 const WEATHER_API = "https://functions.poehali.dev/f1cb531b-1e57-49a1-a494-e158a960aa31";
 
@@ -11,11 +18,6 @@ type WeatherSpot = {
 };
 
 const travelTips = [
-  {
-    icon: "ShieldCheck",
-    title: "Страховка",
-    text: "Оформляйте за 1–2 дня до вылета — так покрытие начнётся ещё до выхода из дома.",
-  },
   {
     icon: "Wallet",
     title: "Деньги в поездке",
@@ -31,6 +33,11 @@ const travelTips = [
     title: "Приезжайте заранее",
     text: "В аэропорту — за 2 часа на внутренний рейс, за 3 часа на международный.",
   },
+  {
+    icon: "Luggage",
+    title: "Проверьте багаж",
+    text: "Уточните нормы по весу — доплата на стойке выходит в 2–3 раза дороже.",
+  },
 ];
 
 const fallbackWeather: WeatherSpot[] = [
@@ -43,6 +50,20 @@ const fallbackWeather: WeatherSpot[] = [
 export default function WeatherTipsSection() {
   const [weather, setWeather] = useState<WeatherSpot[]>(fallbackWeather);
   const [weatherLoading, setWeatherLoading] = useState(true);
+  const [insuranceOpen, setInsuranceOpen] = useState(false);
+  const widgetRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!insuranceOpen || !widgetRef.current) return;
+    const container = widgetRef.current;
+    container.innerHTML = "";
+    const script = document.createElement("script");
+    script.async = true;
+    script.charset = "utf-8";
+    script.src =
+      "//tpemd.com/content?trs=527526&shmarker=727110&destinations=shengen&color1=%237B9D52ff&color2=%237B9D52ff&powered_by=false&campaign_id=49&promo_id=4319";
+    container.appendChild(script);
+  }, [insuranceOpen]);
 
   useEffect(() => {
     let cancelled = false;
@@ -107,6 +128,40 @@ export default function WeatherTipsSection() {
         <h2 className="text-sm font-medium tracking-[0.15em] uppercase text-[#8a8a8a] mb-6 font-['IBM_Plex_Mono']">
           Советы перед поездкой
         </h2>
+
+        {/* Insurance Promo */}
+        <button
+          type="button"
+          onClick={() => setInsuranceOpen(true)}
+          className="w-full text-left mb-3 group relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#7B9D52] to-[#5f7d3e] p-6 md:p-7 text-white transition-all hover:shadow-lg hover:-translate-y-0.5"
+        >
+          <div className="absolute -right-6 -top-6 w-32 h-32 rounded-full bg-white/10 blur-2xl" />
+          <div className="absolute -right-10 bottom-0 opacity-10">
+            <Icon name="ShieldCheck" size={180} />
+          </div>
+          <div className="relative flex flex-col md:flex-row md:items-center gap-4 md:gap-6">
+            <div className="shrink-0 w-12 h-12 rounded-xl bg-white/15 backdrop-blur flex items-center justify-center">
+              <Icon name="ShieldCheck" size={24} className="text-white" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <span className="inline-block text-[10px] tracking-[0.15em] font-['IBM_Plex_Mono'] bg-white/15 px-2 py-1 rounded mb-2">
+                СТРАХОВКА · 1 МИНУТА
+              </span>
+              <h3 className="text-xl md:text-2xl font-bold leading-tight mb-1">
+                Застраховался — и в небо со спокойной душой
+              </h3>
+              <p className="text-sm text-white/80 leading-relaxed">
+                Оформите полис прямо сейчас и летите без тревог: врачи,
+                багаж и отмена рейса — всё под защитой.
+              </p>
+            </div>
+            <div className="shrink-0 flex items-center gap-2 bg-white text-[#5f7d3e] font-semibold text-sm px-5 py-3 rounded-xl group-hover:bg-[#f5f5f3] transition-colors">
+              Оформить
+              <Icon name="ArrowRight" size={16} />
+            </div>
+          </div>
+        </button>
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           {travelTips.map((tip) => (
             <div
@@ -128,6 +183,21 @@ export default function WeatherTipsSection() {
           ))}
         </div>
       </section>
+
+      <Dialog open={insuranceOpen} onOpenChange={setInsuranceOpen}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-bold text-[#111]">
+              Туристическая страховка
+            </DialogTitle>
+            <DialogDescription className="text-[#8a8a8a]">
+              Подберите полис за минуту — выберите страны, даты и
+              получите цены от ведущих страховых.
+            </DialogDescription>
+          </DialogHeader>
+          <div ref={widgetRef} className="min-h-[400px] mt-2" />
+        </DialogContent>
+      </Dialog>
     </>
   );
 }
