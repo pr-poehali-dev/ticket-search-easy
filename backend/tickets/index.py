@@ -4,7 +4,7 @@ import re
 import psycopg2
 
 ADMIN_EMAIL = "centr.mol89@bk.ru"
-SCHEMA = "public"
+SCHEMA = os.environ.get("MAIN_DB_SCHEMA", "t_p36523570_ticket_search_easy")
 
 CORS = {
     "Access-Control-Allow-Origin": "*",
