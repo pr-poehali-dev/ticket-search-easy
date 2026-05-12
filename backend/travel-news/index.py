@@ -140,7 +140,7 @@ def handler(event: dict, context) -> dict:
     for tag, url in RSS_FEEDS:
         try:
             data = fetch_feed(url)
-            items = parse_rss(data, tag, limit=4)
+            items = parse_rss(data, tag, limit=8)
             for it in items:
                 key = it["title"].lower()[:60]
                 if key in seen_titles:
@@ -150,8 +150,8 @@ def handler(event: dict, context) -> dict:
         except Exception:
             continue
 
-    if not all_news:
-        all_news = [
+    if len(all_news) < 6:
+        backup = [
             {
                 "tag": "ВИЗЫ",
                 "date": "",
@@ -176,7 +176,37 @@ def handler(event: dict, context) -> dict:
                 "link": "",
                 "icon": "Building2",
             },
+            {
+                "tag": "ТУРИЗМ",
+                "date": "",
+                "title": "Турция упростила процедуру электронной визы",
+                "desc": "Срок оформления e-Visa сократился до нескольких минут.",
+                "link": "",
+                "icon": "Globe",
+            },
+            {
+                "tag": "ПУТЕШЕСТВИЯ",
+                "date": "",
+                "title": "ОАЭ запустили новые маршруты в горы Хаджар",
+                "desc": "Туристические тропы и кемпинги в эмирате Рас-эль-Хайма.",
+                "link": "",
+                "icon": "MapPin",
+            },
+            {
+                "tag": "АВИАЦИЯ",
+                "date": "",
+                "title": "Россия и Индия расширили авиасообщение",
+                "desc": "Добавлены рейсы Москва — Гоа и Санкт-Петербург — Дели.",
+                "link": "",
+                "icon": "Plane",
+            },
         ]
+        existing = {n["title"].lower()[:60] for n in all_news}
+        for b in backup:
+            if len(all_news) >= 6:
+                break
+            if b["title"].lower()[:60] not in existing:
+                all_news.append(b)
 
     body = {
         "news": all_news[:6],

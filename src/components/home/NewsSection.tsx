@@ -34,6 +34,27 @@ const fallbackNews: NewsItem[] = [
     desc: "Новые зоны досмотра и автоматические стойки регистрации сократили очереди.",
     icon: "Building2",
   },
+  {
+    tag: "ТУРИЗМ",
+    date: "",
+    title: "Турция упростила процедуру электронной визы",
+    desc: "Срок оформления e-Visa сократился до нескольких минут, оплата картой РФ.",
+    icon: "Globe",
+  },
+  {
+    tag: "ПУТЕШЕСТВИЯ",
+    date: "",
+    title: "ОАЭ запустили новые маршруты в горы Хаджар",
+    desc: "Туристические тропы и кемпинги в эмирате Рас-эль-Хайма.",
+    icon: "MapPin",
+  },
+  {
+    tag: "АВИАЦИЯ",
+    date: "",
+    title: "Россия и Индия расширили авиасообщение",
+    desc: "Добавлены рейсы Москва — Гоа и Санкт-Петербург — Дели.",
+    icon: "Plane",
+  },
 ];
 
 export default function NewsSection() {
@@ -67,7 +88,7 @@ export default function NewsSection() {
   }, []);
 
   return (
-    <section className="px-6 pb-12 max-w-4xl mx-auto">
+    <section className="px-6 pb-12 max-w-6xl mx-auto">
       <div className="flex items-end justify-between mb-6">
         <h2 className="text-sm font-medium tracking-[0.15em] uppercase text-[#8a8a8a] font-['IBM_Plex_Mono']">
           Новости для путешественников
