@@ -42,9 +42,30 @@ export default function SearchWidget() {
 
     const fallback = setTimeout(() => setWidgetReady(true), 10000);
 
+    // Следим за появлением результатов поиска и скроллим к ним
+    const ticketsEl = document.getElementById("tpwl-tickets");
+    let ticketsObserver: MutationObserver | null = null;
+    let scrolled = false;
+    if (ticketsEl) {
+      ticketsObserver = new MutationObserver(() => {
+        if (!scrolled && ticketsEl.children.length > 0) {
+          scrolled = true;
+          setTimeout(() => {
+            ticketsEl.scrollIntoView({ behavior: "smooth", block: "start" });
+          }, 250);
+        }
+        // если результаты очистились — снова разрешаем скролл при новом поиске
+        if (ticketsEl.children.length === 0) {
+          scrolled = false;
+        }
+      });
+      ticketsObserver.observe(ticketsEl, { childList: true });
+    }
+
     return () => {
       script.remove();
       observer?.disconnect();
+      ticketsObserver?.disconnect();
       clearTimeout(fallback);
     };
   }, []);
