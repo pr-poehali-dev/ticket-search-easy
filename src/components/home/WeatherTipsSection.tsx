@@ -51,18 +51,26 @@ export default function WeatherTipsSection() {
   const [weather, setWeather] = useState<WeatherSpot[]>(fallbackWeather);
   const [weatherLoading, setWeatherLoading] = useState(true);
   const [insuranceOpen, setInsuranceOpen] = useState(false);
-  const widgetRef = useRef<HTMLDivElement>(null);
+  const iframeRef = useRef<HTMLIFrameElement>(null);
 
   useEffect(() => {
-    if (!insuranceOpen || !widgetRef.current) return;
-    const container = widgetRef.current;
-    container.innerHTML = "";
-    const script = document.createElement("script");
-    script.async = true;
-    script.charset = "utf-8";
-    script.src =
-      "//tpemd.com/content?trs=527526&shmarker=727110&destinations=shengen&color1=%237B9D52ff&color2=%237B9D52ff&powered_by=false&campaign_id=49&promo_id=4319";
-    container.appendChild(script);
+    if (!insuranceOpen || !iframeRef.current) return;
+    const iframe = iframeRef.current;
+    const doc = iframe.contentDocument;
+    if (!doc) return;
+    const closeTag = "</" + "script>";
+    const html =
+      '<!DOCTYPE html><html><head><meta charset="utf-8">' +
+      '<meta name="viewport" content="width=device-width,initial-scale=1">' +
+      "<style>html,body{margin:0;padding:0;background:transparent;" +
+      'font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;}</style>' +
+      "</head><body>" +
+      '<script async charset="utf-8" src="https://tpemd.com/content?trs=527526&shmarker=727110&destinations=shengen&color1=%237B9D52ff&color2=%237B9D52ff&powered_by=false&campaign_id=49&promo_id=4319">' +
+      closeTag +
+      "</body></html>";
+    doc.open();
+    doc.write(html);
+    doc.close();
   }, [insuranceOpen]);
 
   useEffect(() => {
@@ -195,7 +203,11 @@ export default function WeatherTipsSection() {
               получите цены от ведущих страховых.
             </DialogDescription>
           </DialogHeader>
-          <div ref={widgetRef} className="min-h-[400px] mt-2" />
+          <iframe
+            ref={iframeRef}
+            title="Подбор страховки"
+            className="w-full min-h-[520px] border-0 mt-2 bg-transparent"
+          />
         </DialogContent>
       </Dialog>
     </>
