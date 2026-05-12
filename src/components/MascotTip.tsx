@@ -1,11 +1,10 @@
 import { useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Icon from "@/components/ui/icon";
 import { MASCOT_STORIES } from "@/data/mascotStories";
 
-const MASCOT_IMG =
-  "https://cdn.poehali.dev/projects/deb6d332-2cc4-4c3a-bcd1-e4e0a738361b/files/d5ad73a9-40a6-498d-b605-f7b4722a5c01.jpg";
-
 export default function MascotTip() {
+  const navigate = useNavigate();
   const [idx, setIdx] = useState(() =>
     Math.floor(Math.random() * MASCOT_STORIES.length),
   );
@@ -103,43 +102,15 @@ export default function MascotTip() {
       {/* Тонкая верхняя линия */}
       <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#7B9D52]/60 to-transparent" />
 
-      <div className="relative grid grid-cols-1 sm:grid-cols-[auto_1fr] gap-0">
-        {/* Маскот */}
-        <div className="hidden sm:flex flex-col items-center justify-center px-7 py-7 border-r border-white/5">
-          <div className="relative">
-            <div className="absolute inset-0 bg-gradient-to-br from-[#7B9D52] to-[#c97a2b] rounded-full blur-xl opacity-40" />
-            <div className="relative w-24 h-24 rounded-full overflow-hidden border-2 border-white/15 shadow-2xl">
-              <img
-                src={MASCOT_IMG}
-                alt="Гоша"
-                className="w-full h-full object-cover"
-              />
-            </div>
-            <span className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-[#7B9D52] border-[3px] border-[#1a1f17] flex items-center justify-center">
-              <Icon name="Plane" size={11} className="text-white" />
-            </span>
-          </div>
-          <p className="mt-3 text-white text-sm font-semibold">Гоша</p>
-          <p className="text-[10px] tracking-[0.2em] uppercase text-white/40 font-['IBM_Plex_Mono'] mt-0.5">
-            Капитан совет
-          </p>
-        </div>
-
+      <div className="relative">
         {/* Контент */}
         <div className="p-5 sm:p-7 flex flex-col">
           <div className="flex items-start gap-3 mb-4">
-            <div className="sm:hidden w-11 h-11 rounded-full overflow-hidden border-2 border-white/20 flex-shrink-0">
-              <img
-                src={MASCOT_IMG}
-                alt="Гоша"
-                className="w-full h-full object-cover"
-              />
-            </div>
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 mb-1">
                 <span className="w-1.5 h-1.5 rounded-full bg-[#7B9D52] animate-pulse" />
                 <p className="text-[10px] tracking-[0.25em] uppercase text-white/50 font-['IBM_Plex_Mono'] font-medium">
-                  Гоша рекомендует
+                  Совет дня
                 </p>
               </div>
               <div className="inline-flex items-center gap-1.5 bg-white/8 backdrop-blur-sm px-2.5 py-1 rounded-full border border-white/10">
@@ -213,6 +184,13 @@ export default function MascotTip() {
             >
               <Icon name="Shuffle" size={12} />
               Другой
+            </button>
+            <button
+              onClick={() => navigate("/sovety")}
+              className="text-xs text-white/70 hover:text-white px-4 py-2.5 rounded-full bg-white/5 hover:bg-white/15 border border-white/10 transition-all flex items-center gap-1.5"
+            >
+              <Icon name="BookOpen" size={12} />
+              Все советы
             </button>
             <span className="ml-auto text-[10px] text-white/30 font-['IBM_Plex_Mono'] tracking-wider">
               {String(idx + 1).padStart(2, "0")} /{" "}

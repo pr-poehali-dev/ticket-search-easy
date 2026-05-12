@@ -6,6 +6,7 @@ import Mascot from "@/components/Mascot";
 
 const navItems = [
   { path: "/", label: "Поиск", icon: "Search" },
+  { path: "/sovety", label: "Советы", icon: "Compass" },
   { path: "/cabinet", label: "Кабинет", icon: "User" },
   { path: "/faq", label: "Помощь", icon: "HelpCircle" },
   { path: "/contacts", label: "Контакты", icon: "MessageSquare" },
