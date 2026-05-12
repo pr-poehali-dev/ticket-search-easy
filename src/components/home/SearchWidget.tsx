@@ -66,15 +66,34 @@ export default function SearchWidget() {
 
     // 1) Перехват fetch — основной способ ловли запроса поиска
     const origFetch = window.fetch;
-    const isSearchUrl = (url: string) => {
-      // Исключаем вспомогательные эндпоинты: автокомплит мест, локация, конфиги
-      if (/whereami|places|autocomplete|suggest|config|favicon|\.css|\.svg|\.png|\.woff/i.test(url)) {
-        return false;
+    // Главный поисковый запрос виджета TPWL (по нему мы понимаем, что
+    // пользователь нажал «Найти билеты» — а не выбрал поле/дату/город)
+    const isSearchUrl = (url: string) =>
+      /prices\/graphql\/query/i.test(url);
+
+    // Считаем поиск стартовавшим только после нескольких подряд таких запросов,
+    // т.к. виджет может слать одиночный graphql и при подгрузке fare-calendar.
+    let searchHits = 0;
+    let resetHitsTimer: number | null = null;
+    const noteSearchHit = (body?: string) => {
+      // Фильтр по содержимому: реальный поиск содержит operationName "Tickets" / "Prices"
+      // или поле passengers / segments. Если тело есть и в нём нет таких признаков —
+      // считаем это сопутствующим запросом (календарь и т.д.) и игнорим.
+      if (body) {
+        const looksLikeRealSearch =
+          /"(passengers|segments|tripClass|searchParams|origin)"/i.test(body) ||
+          /Tickets|MainSearch|FlightsSearch/i.test(body);
+        if (!looksLikeRealSearch) return;
       }
-      // Реальный поисковый запрос Travelpayouts
-      return /apistp\.com.*(flights|tickets|prices|search)|prices.*graphql|search_id|search_start/i.test(
-        url,
-      );
+      searchHits += 1;
+      if (resetHitsTimer) clearTimeout(resetHitsTimer);
+      resetHitsTimer = window.setTimeout(() => {
+        searchHits = 0;
+      }, 4000);
+      if (searchHits >= 2) {
+        searchHits = 0;
+        startSearchingUX();
+      }
     };
 
     window.fetch = function (
@@ -89,7 +108,9 @@ export default function SearchWidget() {
               ? input.toString()
               : (input as Request).url;
         if (url && isSearchUrl(url)) {
-          startSearchingUX();
+          const body =
+            typeof init?.body === "string" ? init.body : undefined;
+          noteSearchHit(body);
         }
       } catch {
         /* noop */
@@ -99,6 +120,7 @@ export default function SearchWidget() {
 
     // 2) Перехват XHR — на всякий случай
     const origXhrOpen = XMLHttpRequest.prototype.open;
+    const origXhrSend = XMLHttpRequest.prototype.send;
     XMLHttpRequest.prototype.open = function (
       method: string,
       url: string | URL,
@@ -106,14 +128,25 @@ export default function SearchWidget() {
     ) {
       try {
         const u = typeof url === "string" ? url : url.toString();
-        if (u && isSearchUrl(u)) {
-          startSearchingUX();
-        }
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (this as any).__tpwlSearchUrl = u && isSearchUrl(u);
       } catch {
         /* noop */
       }
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       return origXhrOpen.apply(this, [method, url, ...rest] as any);
+    };
+    XMLHttpRequest.prototype.send = function (body?: Document | XMLHttpRequestBodyInit | null) {
+      try {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        if ((this as any).__tpwlSearchUrl) {
+          const b = typeof body === "string" ? body : undefined;
+          noteSearchHit(b);
+        }
+      } catch {
+        /* noop */
+      }
+      return origXhrSend.call(this, body as Document);
     };
 
     // 3) Снимаем плашку, когда в #tpwl-tickets появился контент
@@ -139,6 +172,8 @@ export default function SearchWidget() {
       ticketsObserver?.disconnect();
       window.fetch = origFetch;
       XMLHttpRequest.prototype.open = origXhrOpen;
+      XMLHttpRequest.prototype.send = origXhrSend;
+      if (resetHitsTimer) clearTimeout(resetHitsTimer);
       if (searchingTimer.current) clearTimeout(searchingTimer.current);
       clearTimeout(fallback);
     };
