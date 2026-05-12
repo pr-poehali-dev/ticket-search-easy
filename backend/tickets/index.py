@@ -168,7 +168,7 @@ def list_tickets(cur, user, params):
 
 
 def generate_ai_reply(subject: str, message: str, department: str, city: str, history: list) -> str:
-    api_key = os.environ.get("OPENAI_API_KEY", "").strip()
+    api_key = os.environ.get("POLZA_AI_API_KEY", "").strip()
     if not api_key:
         return ""
 
@@ -195,14 +195,14 @@ def generate_ai_reply(subject: str, message: str, department: str, city: str, hi
     messages.append({"role": "user", "content": user_intro})
 
     payload = json.dumps({
-        "model": "gpt-4o-mini",
+        "model": "openai/gpt-4o-mini",
         "messages": messages,
         "temperature": 0.4,
         "max_tokens": 400,
     }).encode("utf-8")
 
     req = urllib.request.Request(
-        "https://api.openai.com/v1/chat/completions",
+        "https://api.polza.ai/api/v1/chat/completions",
         data=payload,
         headers={
             "Authorization": f"Bearer {api_key}",
