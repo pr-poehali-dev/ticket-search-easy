@@ -38,8 +38,6 @@ const fillSearchFromQuery = () => {
       (all.includes("куда") || all.includes("destination") || all.includes(" to"))
     ) {
       setNativeValue(input, to);
-      input.focus();
-      input.blur();
       filledTo = true;
     }
 
@@ -109,31 +107,42 @@ export default function SearchWidget() {
 
     const fallback = setTimeout(() => setWidgetReady(true), 10000);
 
-    // Автозаполнение из URL (?to=...&month=...) после прогрузки виджета
-    const params = new URLSearchParams(window.location.search);
-    if (params.get("to") || params.get("month")) {
-      let attempts = 0;
-      const maxAttempts = 30;
-      const tryFill = () => {
-        attempts += 1;
-        const ok = fillSearchFromQuery();
-        if (ok) {
-          target?.scrollIntoView({ behavior: "smooth", block: "start" });
-          // очистим query, чтобы не мешал при дальнейшей навигации
-          window.history.replaceState({}, "", window.location.pathname);
-        } else if (attempts < maxAttempts) {
-          setTimeout(tryFill, 400);
-        }
-      };
-      setTimeout(tryFill, 1200);
-    }
-
     return () => {
       script.remove();
       observer?.disconnect();
       clearTimeout(fallback);
     };
   }, []);
+
+  // Автозаполнение из URL (?to=...&month=...) — только после готовности виджета
+  useEffect(() => {
+    if (!widgetReady) return;
+    const params = new URLSearchParams(window.location.search);
+    if (!params.get("to") && !params.get("month")) return;
+
+    const target = document.getElementById("tpwl-search");
+    let attempts = 0;
+    const maxAttempts = 15;
+    let timer: number | undefined;
+
+    const tryFill = () => {
+      attempts += 1;
+      const ok = fillSearchFromQuery();
+      if (ok) {
+        setTimeout(() => {
+          target?.scrollIntoView({ behavior: "smooth", block: "start" });
+        }, 200);
+        window.history.replaceState({}, "", window.location.pathname);
+      } else if (attempts < maxAttempts) {
+        timer = window.setTimeout(tryFill, 500);
+      }
+    };
+
+    timer = window.setTimeout(tryFill, 1500);
+    return () => {
+      if (timer) clearTimeout(timer);
+    };
+  }, [widgetReady]);
 
   return (
     <>
