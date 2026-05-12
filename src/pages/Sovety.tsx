@@ -55,28 +55,13 @@ export default function Sovety() {
       .finally(() => setPricesLoading(false));
   }, []);
 
-  const monthToNum: Record<string, string> = {
-    январь: "01", февраль: "02", март: "03", апрель: "04",
-    май: "05", июнь: "06", июль: "07", август: "08",
-    сентябрь: "09", октябрь: "10", ноябрь: "11", декабрь: "12",
-  };
-
-  const goSearch = (city: string, iata?: string, month?: string) => {
+  const goSearch = (city: string) => {
     if (navigator.clipboard) {
       navigator.clipboard.writeText(city).catch(() => {});
     }
     setCopiedCity(city);
-
-    const params = new URLSearchParams();
-    params.set("to", city);
-    if (iata) params.set("iata", iata);
-    if (month && monthToNum[month.toLowerCase()]) {
-      params.set("month", monthToNum[month.toLowerCase()]);
-    }
-
-    // Полная перезагрузка — гарантирует свежую инициализацию виджета Aviasales
     setTimeout(() => {
-      window.location.href = `/?${params.toString()}`;
+      window.location.href = "/";
     }, 500);
   };
 
@@ -239,7 +224,7 @@ export default function Sovety() {
                 {/* Ценник — кликабельный */}
                 {price && (
                   <button
-                    onClick={() => goSearch(story.city, story.iata, price.month)}
+                    onClick={() => goSearch(story.city)}
                     aria-label={`Найти билеты от ${formatPrice(price.price)}`}
                     className="absolute top-14 right-5 z-10 animate-fade-in group/price"
                   >
@@ -302,7 +287,7 @@ export default function Sovety() {
 
                   <div className="mt-auto flex items-center gap-2 flex-wrap">
                     <button
-                      onClick={() => goSearch(story.city, story.iata, price?.month)}
+                      onClick={() => goSearch(story.city)}
                       className="bg-white text-[#111] text-sm font-semibold px-4 py-2 rounded-full hover:bg-[#f5efe3] transition-all flex items-center gap-1.5 shadow-lg"
                     >
                       {copiedCity === story.city ? (
