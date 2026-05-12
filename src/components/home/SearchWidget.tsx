@@ -66,34 +66,28 @@ export default function SearchWidget() {
 
     // 1) Перехват fetch — основной способ ловли запроса поиска
     const origFetch = window.fetch;
-    // Главный поисковый запрос виджета TPWL (по нему мы понимаем, что
-    // пользователь нажал «Найти билеты» — а не выбрал поле/дату/город)
+    // Главный поисковый запрос виджета TPWL.
+    // Реальный «Найти билеты» = запрос на prices/graphql/query, и в теле есть
+    // признаки настоящего поиска (passengers/segments/trip_class и т.п.).
+    // Календарь цен / автокомплит / валюта в эти признаки НЕ попадают.
     const isSearchUrl = (url: string) =>
       /prices\/graphql\/query/i.test(url);
 
-    // Считаем поиск стартовавшим только после нескольких подряд таких запросов,
-    // т.к. виджет может слать одиночный graphql и при подгрузке fare-calendar.
-    let searchHits = 0;
-    let resetHitsTimer: number | null = null;
+    let lastFiredAt = 0;
     const noteSearchHit = (body?: string) => {
-      // Фильтр по содержимому: реальный поиск содержит operationName "Tickets" / "Prices"
-      // или поле passengers / segments. Если тело есть и в нём нет таких признаков —
-      // считаем это сопутствующим запросом (календарь и т.д.) и игнорим.
+      // Антидребезг: не чаще одного срабатывания в 3 секунды
+      const now = Date.now();
+      if (now - lastFiredAt < 3000) return;
+
+      // Проверка тела: ищем явные признаки реального поиска билетов
       if (body) {
         const looksLikeRealSearch =
-          /"(passengers|segments|tripClass|searchParams|origin)"/i.test(body) ||
-          /Tickets|MainSearch|FlightsSearch/i.test(body);
+          /passengers|segments|trip_class|tripClass|adults/i.test(body);
         if (!looksLikeRealSearch) return;
       }
-      searchHits += 1;
-      if (resetHitsTimer) clearTimeout(resetHitsTimer);
-      resetHitsTimer = window.setTimeout(() => {
-        searchHits = 0;
-      }, 4000);
-      if (searchHits >= 2) {
-        searchHits = 0;
-        startSearchingUX();
-      }
+
+      lastFiredAt = now;
+      startSearchingUX();
     };
 
     window.fetch = function (
@@ -173,7 +167,6 @@ export default function SearchWidget() {
       window.fetch = origFetch;
       XMLHttpRequest.prototype.open = origXhrOpen;
       XMLHttpRequest.prototype.send = origXhrSend;
-      if (resetHitsTimer) clearTimeout(resetHitsTimer);
       if (searchingTimer.current) clearTimeout(searchingTimer.current);
       clearTimeout(fallback);
     };
