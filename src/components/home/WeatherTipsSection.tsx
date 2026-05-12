@@ -51,36 +51,20 @@ export default function WeatherTipsSection() {
   const [weather, setWeather] = useState<WeatherSpot[]>(fallbackWeather);
   const [weatherLoading, setWeatherLoading] = useState(true);
   const [insuranceOpen, setInsuranceOpen] = useState(false);
-  const [iframeHeight, setIframeHeight] = useState(620);
+  const [iframeHeight, setIframeHeight] = useState(640);
   const iframeRef = useRef<HTMLIFrameElement>(null);
 
   useEffect(() => {
     if (!insuranceOpen) {
-      setIframeHeight(620);
+      setIframeHeight(640);
       return;
     }
     const iframe = iframeRef.current;
     if (!iframe) return;
 
-    const widgetHtml =
-      "<!DOCTYPE html><html><head><meta charset=\"utf-8\">" +
-      '<meta name="viewport" content="width=device-width,initial-scale=1">' +
-      "<base target=\"_blank\">" +
-      "<style>html,body{margin:0;padding:0;background:#fff;" +
-      "font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;}" +
-      "*{box-sizing:border-box;}</style>" +
-      "</head><body>" +
-      '<script async src="https://tpemd.com/content?' +
-      "trs=527526&shmarker=727110&destinations=shengen" +
-      "&color1=%237B9D52ff&color2=%237B9D52ff" +
-      '&powered_by=false&campaign_id=49&promo_id=4319" charset="utf-8"></' +
-      "script></body></html>";
-
-    iframe.srcdoc = widgetHtml;
-
     let observer: ResizeObserver | null = null;
     let interval: number | null = null;
-    let timers: number[] = [];
+    const timers: number[] = [];
 
     const onLoad = () => {
       const doc = iframe.contentDocument;
@@ -100,17 +84,19 @@ export default function WeatherTipsSection() {
         if (h > 100) setIframeHeight(h + 24);
       };
 
-      if (typeof win.ResizeObserver !== "undefined") {
-        observer = new win.ResizeObserver(() => measure());
-        observer.observe(doc.body);
+      try {
+        if (typeof win.ResizeObserver !== "undefined") {
+          observer = new win.ResizeObserver(() => measure());
+          observer.observe(doc.body);
+        }
+        interval = win.setInterval(measure, 800) as unknown as number;
+        timers.push(win.setTimeout(measure, 400) as unknown as number);
+        timers.push(win.setTimeout(measure, 1500) as unknown as number);
+        timers.push(win.setTimeout(measure, 3500) as unknown as number);
+        timers.push(win.setTimeout(measure, 6000) as unknown as number);
+      } catch {
+        // ignore cross-origin errors (won't happen for same-origin /public file)
       }
-      interval = win.setInterval(measure, 800) as unknown as number;
-      timers = [
-        win.setTimeout(measure, 300) as unknown as number,
-        win.setTimeout(measure, 1500) as unknown as number,
-        win.setTimeout(measure, 3500) as unknown as number,
-        win.setTimeout(measure, 6000) as unknown as number,
-      ];
     };
 
     iframe.addEventListener("load", onLoad);
@@ -119,8 +105,12 @@ export default function WeatherTipsSection() {
       iframe.removeEventListener("load", onLoad);
       if (observer) observer.disconnect();
       const win = iframe.contentWindow;
-      if (win && interval !== null) win.clearInterval(interval);
-      if (win) timers.forEach((t) => win.clearTimeout(t));
+      try {
+        if (win && interval !== null) win.clearInterval(interval);
+        if (win) timers.forEach((t) => win.clearTimeout(t));
+      } catch {
+        // ignore
+      }
     };
   }, [insuranceOpen]);
 
@@ -254,16 +244,19 @@ export default function WeatherTipsSection() {
               получите цены от ведущих страховых.
             </DialogDescription>
           </DialogHeader>
-          <iframe
-            ref={iframeRef}
-            title="Подбор страховки"
-            className="w-full border-0 mt-2 bg-white block rounded-xl"
-            style={{ height: iframeHeight }}
-          />
+          {insuranceOpen && (
+            <iframe
+              ref={iframeRef}
+              title="Подбор страховки"
+              src="/insurance-widget.html"
+              className="w-full border-0 mt-2 bg-white block rounded-xl"
+              style={{ height: iframeHeight }}
+            />
+          )}
           <p className="text-xs text-[#8a8a8a] mt-3 text-center">
             Если форма не загрузилась —{" "}
             <a
-              href="https://tp.media/r?marker=727110&trs=527526&p=4480&u=https%3A%2F%2Fcherehapa.ru&campaign_id=121"
+              href="/insurance-widget.html"
               target="_blank"
               rel="noopener noreferrer"
               className="text-[#7B9D52] underline font-medium"
