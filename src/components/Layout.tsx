@@ -58,19 +58,35 @@ export default function Layout() {
 
           {/* Desktop nav */}
           <nav className="hidden sm:flex items-center gap-1">
-            {navItems.map((item) => (
-              <button
-                key={item.path}
-                onClick={() => go(item.path)}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                  isActive(item.path)
-                    ? "bg-[#7B9D52]/10 text-[#7B9D52]"
-                    : "text-[#8a8a8a] hover:text-[#111] hover:bg-[#f7f7f6]"
-                }`}
-              >
-                {item.label}
-              </button>
-            ))}
+            {navItems.map((item) =>
+              item.path === "/cabinet" ? (
+                <button
+                  key={item.path}
+                  onClick={() => go(item.path)}
+                  aria-label={item.label}
+                  title={item.label}
+                  className={`w-10 h-10 rounded-lg flex items-center justify-center transition-all ${
+                    isActive(item.path)
+                      ? "bg-[#7B9D52]/10 text-[#7B9D52]"
+                      : "text-[#8a8a8a] hover:text-[#111] hover:bg-[#f7f7f6]"
+                  }`}
+                >
+                  <Icon name={item.icon} size={18} />
+                </button>
+              ) : (
+                <button
+                  key={item.path}
+                  onClick={() => go(item.path)}
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                    isActive(item.path)
+                      ? "bg-[#7B9D52]/10 text-[#7B9D52]"
+                      : "text-[#8a8a8a] hover:text-[#111] hover:bg-[#f7f7f6]"
+                  }`}
+                >
+                  {item.label}
+                </button>
+              ),
+            )}
           </nav>
 
           {/* Mobile icons */}
