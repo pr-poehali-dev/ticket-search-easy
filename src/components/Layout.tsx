@@ -58,22 +58,9 @@ export default function Layout() {
 
           {/* Desktop nav */}
           <nav className="hidden sm:flex items-center gap-1">
-            {navItems.map((item) =>
-              item.path === "/cabinet" ? (
-                <button
-                  key={item.path}
-                  onClick={() => go(item.path)}
-                  aria-label={item.label}
-                  title={item.label}
-                  className={`w-10 h-10 rounded-lg flex items-center justify-center transition-all ${
-                    isActive(item.path)
-                      ? "bg-[#7B9D52]/10 text-[#7B9D52]"
-                      : "text-[#8a8a8a] hover:text-[#111] hover:bg-[#f7f7f6]"
-                  }`}
-                >
-                  <Icon name={item.icon} size={18} />
-                </button>
-              ) : (
+            {navItems
+              .filter((item) => item.path !== "/cabinet")
+              .map((item) => (
                 <button
                   key={item.path}
                   onClick={() => go(item.path)}
@@ -85,8 +72,20 @@ export default function Layout() {
                 >
                   {item.label}
                 </button>
-              ),
-            )}
+              ))}
+            <div className="w-px h-6 bg-[#e8e8e6] mx-2" />
+            <button
+              onClick={() => go("/cabinet")}
+              aria-label="Кабинет"
+              title="Кабинет"
+              className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all shadow-sm ${
+                isActive("/cabinet")
+                  ? "bg-[#6b8a47] text-white"
+                  : "bg-[#7B9D52] text-white hover:bg-[#6b8a47]"
+              }`}
+            >
+              <Icon name="User" size={18} />
+            </button>
           </nav>
 
           {/* Mobile icons */}
