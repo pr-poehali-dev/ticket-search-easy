@@ -20,7 +20,6 @@ export default function Contacts() {
   const [department, setDepartment] = useState(DEPARTMENTS[0]);
   const [city, setCity] = useState("");
   const [phone, setPhone] = useState("");
-  const [position, setPosition] = useState("");
   const [message, setMessage] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -44,13 +43,11 @@ export default function Contacts() {
         city,
         contact_phone: phone || user.phone || "",
         contact_email: user.email,
-        contact_position: position,
       });
       setCreatedId(res.ticket.id);
       setSubject("");
       setCity("");
       setPhone("");
-      setPosition("");
       setMessage("");
       setDepartment(DEPARTMENTS[0]);
       setConsent(false);
@@ -192,18 +189,6 @@ export default function Contacts() {
                       className="w-full border border-[#e8e8e6] rounded-xl px-4 py-3 text-sm text-[#111] placeholder:text-[#c0c0bc] focus:outline-none focus:border-[#111] transition-colors"
                     />
                   </div>
-                </div>
-
-                <div>
-                  <label className="text-xs text-[#8a8a8a] uppercase tracking-wider font-['IBM_Plex_Mono'] font-medium block mb-1.5">
-                    Должность / пост (опционально)
-                  </label>
-                  <input
-                    value={position}
-                    onChange={(e) => setPosition(e.target.value)}
-                    placeholder="Например, директор по продажам"
-                    className="w-full border border-[#e8e8e6] rounded-xl px-4 py-3 text-sm text-[#111] placeholder:text-[#c0c0bc] focus:outline-none focus:border-[#111] transition-colors"
-                  />
                 </div>
 
                 <div>
