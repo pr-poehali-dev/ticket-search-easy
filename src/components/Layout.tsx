@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Outlet, useNavigate, useLocation } from "react-router-dom";
 import Icon from "@/components/ui/icon";
 import CookieBanner from "@/components/CookieBanner";
+import { useUnreadTickets } from "@/hooks/useUnreadTickets";
 
 const navItems = [
   { path: "/", label: "Поиск", icon: "Search" },
@@ -15,6 +16,7 @@ export default function Layout() {
   const navigate = useNavigate();
   const location = useLocation();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const hasUnread = useUnreadTickets();
 
   const isActive = (path: string) =>
     path === "/" ? location.pathname === "/" : location.pathname.startsWith(path);
@@ -77,14 +79,17 @@ export default function Layout() {
             <button
               onClick={() => go("/cabinet")}
               aria-label="Кабинет"
-              title="Кабинет"
-              className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all shadow-sm ${
+              title={hasUnread ? "Кабинет — новые ответы" : "Кабинет"}
+              className={`relative w-10 h-10 rounded-xl flex items-center justify-center transition-all shadow-sm ${
                 isActive("/cabinet")
                   ? "bg-[#6b8a47] text-white"
                   : "bg-[#7B9D52] text-white hover:bg-[#6b8a47]"
               }`}
             >
               <Icon name="User" size={18} />
+              {hasUnread && (
+                <span className="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-[#e53935] rounded-full ring-2 ring-white animate-pulse" />
+              )}
             </button>
           </nav>
 
@@ -93,13 +98,16 @@ export default function Layout() {
             <button
               onClick={() => go("/cabinet")}
               aria-label="Личный кабинет"
-              className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all ${
+              className={`relative w-10 h-10 rounded-xl flex items-center justify-center transition-all ${
                 isActive("/cabinet")
                   ? "bg-[#7B9D52]/10 text-[#7B9D52]"
                   : "text-[#111] hover:bg-[#f7f7f6]"
               }`}
             >
               <Icon name="User" size={20} />
+              {hasUnread && (
+                <span className="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-[#e53935] rounded-full ring-2 ring-white animate-pulse" />
+              )}
             </button>
             <button
               onClick={() => setMobileOpen((v) => !v)}

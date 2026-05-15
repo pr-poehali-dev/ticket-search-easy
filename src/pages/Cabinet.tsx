@@ -3,6 +3,7 @@ import { useSearchParams } from "react-router-dom";
 import Icon from "@/components/ui/icon";
 import { useAuth } from "@/hooks/useAuth";
 import { isAdminEmail } from "@/hooks/useTickets";
+import { markTicketsSeen } from "@/hooks/useUnreadTickets";
 import CabinetAuthForm from "@/components/cabinet/CabinetAuthForm";
 import CabinetProfileTab from "@/components/cabinet/CabinetProfileTab";
 import CabinetPassportTab from "@/components/cabinet/CabinetPassportTab";
@@ -28,7 +29,12 @@ export default function Cabinet() {
   const changeTab = (t: Tab) => {
     setTab(t);
     setSearchParams({ tab: t }, { replace: true });
+    if (t === "tickets" || t === "admin") markTicketsSeen();
   };
+
+  useEffect(() => {
+    if (tab === "tickets" || tab === "admin") markTicketsSeen();
+  }, [tab]);
 
   if (loading) {
     return (
