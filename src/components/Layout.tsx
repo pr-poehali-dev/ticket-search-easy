@@ -98,7 +98,7 @@ export default function Layout() {
               rel="noopener noreferrer"
               aria-label="Журнал «Открой свою Россию»"
               title="Журнал «Открой свою Россию»"
-              className="ml-1 flex items-center justify-center hover:opacity-70 transition-opacity"
+              className="ml-4 flex items-center justify-center hover:opacity-70 transition-opacity"
             >
               <img
                 src="https://cdn.poehali.dev/projects/deb6d332-2cc4-4c3a-bcd1-e4e0a738361b/bucket/3b3c2c42-6a2f-4f5c-a578-28499807f324.png"
@@ -109,7 +109,7 @@ export default function Layout() {
           </nav>
 
           {/* Mobile icons */}
-          <div className="flex sm:hidden items-center gap-2">
+          <div className="flex sm:hidden items-center gap-3">
             <button
               onClick={() => go("/cabinet")}
               aria-label="Личный кабинет"
