@@ -213,6 +213,47 @@ export default function Layout() {
             </div>
           </div>
 
+          {/* Legal entity */}
+          <div className="pt-8 border-t border-[#e8e8e6] mb-6">
+            <div className="flex flex-col md:flex-row md:items-center gap-5 md:gap-8">
+              <a
+                href="https://t.me/DUBBLE_RF"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex-shrink-0 group"
+                aria-label="Даббл — Департамент коммерческих продуктов"
+              >
+                <img
+                  src="https://cdn.poehali.dev/projects/deb6d332-2cc4-4c3a-bcd1-e4e0a738361b/bucket/b4a50929-5dd7-4445-86e9-6edf48b1ac23.png"
+                  alt="Даббл — Департамент коммерческих продуктов"
+                  className="h-9 w-auto opacity-60 group-hover:opacity-100 transition-opacity"
+                />
+              </a>
+              <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-1.5 text-[11px] text-[#8a8a8a] font-['IBM_Plex_Mono'] leading-relaxed">
+                <div>
+                  <span className="text-[#c0c0bc]">Юр. лицо:</span>{" "}
+                  <span className="text-[#444]">ООО «ДАББЛ РУС»</span>
+                </div>
+                <div>
+                  <span className="text-[#c0c0bc]">ОГРН:</span>{" "}
+                  <span className="text-[#444]">1258900000050</span>
+                </div>
+                <div>
+                  <span className="text-[#c0c0bc]">ИНН:</span>{" "}
+                  <span className="text-[#444]">8905069677</span>
+                  <span className="text-[#c0c0bc]"> · КПП:</span>{" "}
+                  <span className="text-[#444]">890501001</span>
+                </div>
+                <div className="sm:col-span-2">
+                  <span className="text-[#c0c0bc]">Адрес:</span>{" "}
+                  <span className="text-[#444]">
+                    629801, ЯНАО, г. Ноябрьск, ул. Магистральная, д. 119, кв. 212
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+
           {/* Bottom bar */}
           <div className="pt-6 border-t border-[#e8e8e6] flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
             <p className="text-xs text-[#8a8a8a] font-['IBM_Plex_Mono'] leading-relaxed">
