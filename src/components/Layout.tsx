@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Outlet, useNavigate, useLocation } from "react-router-dom";
 import Icon from "@/components/ui/icon";
 import CookieBanner from "@/components/CookieBanner";
+import AirportTicker from "@/components/AirportTicker";
 import { useUnreadTickets } from "@/hooks/useUnreadTickets";
 
 const navItems = [
@@ -123,6 +124,9 @@ export default function Layout() {
           </div>
         </div>
       </header>
+
+      {/* Airport restrictions ticker */}
+      <AirportTicker />
 
       {/* Mobile menu drawer */}
       {mobileOpen && (
