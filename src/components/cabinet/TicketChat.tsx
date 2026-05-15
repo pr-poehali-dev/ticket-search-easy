@@ -135,7 +135,6 @@ export default function TicketChat({ ticketId, isAdmin, onBack, onUpdated }: Pro
   <tr><th>Город</th><td>${safe(ticket.city)}</td></tr>
   <tr><th>Телефон для связи</th><td>${safe(ticket.contact_phone || ticket.user_phone)}</td></tr>
   <tr><th>Email для связи</th><td>${safe(ticket.contact_email || ticket.user_email)}</td></tr>
-  <tr><th>Должность / пост</th><td>${safe(ticket.contact_position)}</td></tr>
 </table>
 <h2>Содержание переписки</h2>
 ${messagesHtml}
@@ -176,7 +175,6 @@ ${messagesHtml}
       `КОНТАКТЫ ДЛЯ ОБРАТНОЙ СВЯЗИ`,
       `Телефон:              ${ticket.contact_phone || ticket.user_phone || "—"}`,
       `Email:                ${ticket.contact_email || ticket.user_email}`,
-      `Должность / пост:     ${ticket.contact_position || "—"}`,
       ``,
       `СОДЕРЖАНИЕ ПЕРЕПИСКИ`,
       ``,
@@ -255,7 +253,7 @@ ${messagesHtml}
             <div className="bg-[#f7f7f6] rounded-lg p-2">
               <div className="text-[10px] uppercase tracking-wider text-[#8a8a8a] font-['IBM_Plex_Mono']">Контакты</div>
               <div className="text-[#111] truncate">{ticket.contact_phone || ticket.user_phone || "—"}</div>
-              <div className="text-[#8a8a8a] truncate">{ticket.contact_position || "—"}</div>
+              <div className="text-[#8a8a8a] truncate">{ticket.contact_email || ticket.user_email}</div>
             </div>
           </div>
         )}
