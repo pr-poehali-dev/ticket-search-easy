@@ -274,12 +274,6 @@ export default function Contacts() {
                 sub: "Ответим за несколько часов",
               },
               {
-                icon: "Phone",
-                label: "Телефон",
-                value: "+7 (800) 123-45-67",
-                sub: "Пн–Пт, 9:00–21:00",
-              },
-              {
                 icon: "MessageCircle",
                 label: "Telegram-бот",
                 value: "@DUBBLE_RF",
