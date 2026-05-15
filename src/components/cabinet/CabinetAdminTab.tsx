@@ -1,11 +1,14 @@
 import { useEffect, useState } from "react";
 import Icon from "@/components/ui/icon";
 import { ticketsApi, TicketSummary } from "@/hooks/useTickets";
+import { useAuth } from "@/hooks/useAuth";
 import TicketChat from "./TicketChat";
+import CabinetAirportControl from "./CabinetAirportControl";
 
 type Filter = "all" | "open" | "closed";
 
 export default function CabinetAdminTab() {
+  const { user } = useAuth();
   const [tickets, setTickets] = useState<TicketSummary[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -65,6 +68,8 @@ export default function CabinetAdminTab() {
           </div>
         )}
       </div>
+
+      {user?.email && <CabinetAirportControl email={user.email} />}
 
       <div className="flex gap-1 bg-white/60 rounded-xl p-1 w-fit border border-[#e8e8e6]">
         {(["all", "open", "closed"] as Filter[]).map((f) => (

@@ -11,6 +11,13 @@
       "method": "OPTIONS",
       "path": "/",
       "expectedStatus": 200
+    },
+    {
+      "name": "POST without admin header is forbidden",
+      "method": "POST",
+      "path": "/",
+      "body": {"op": "add", "airport": "Тест", "city": "Тест"},
+      "expectedStatus": 403
     }
   ]
 }
