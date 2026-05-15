@@ -77,6 +77,23 @@ export default function Layout() {
                 </button>
               ))}
             <div className="w-px h-6 bg-[#e8e8e6] mx-2" />
+            <a
+              href="https://открой-свою-россию.рф"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Журнал «Открой свою Россию»"
+              title="Журнал «Открой свою Россию»"
+              className="group relative w-10 h-10 rounded-xl flex items-center justify-center bg-white border border-[#e8e8e6] hover:border-[#111] transition-all"
+            >
+              <img
+                src="https://cdn.poehali.dev/projects/deb6d332-2cc4-4c3a-bcd1-e4e0a738361b/bucket/3b3c2c42-6a2f-4f5c-a578-28499807f324.png"
+                alt="Открой свою Россию"
+                className="h-5 w-auto"
+              />
+              <span className="absolute -bottom-1 -right-1 w-3.5 h-3.5 rounded-full bg-white border border-[#e8e8e6] flex items-center justify-center text-[8px] text-[#8a8a8a] group-hover:text-[#111] group-hover:border-[#111] transition-colors">
+                <Icon name="ArrowUpRight" size={8} />
+              </span>
+            </a>
             <button
               onClick={() => go("/cabinet")}
               aria-label="Кабинет"
@@ -96,6 +113,19 @@ export default function Layout() {
 
           {/* Mobile icons */}
           <div className="flex sm:hidden items-center gap-2">
+            <a
+              href="https://открой-свою-россию.рф"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Журнал «Открой свою Россию»"
+              className="w-10 h-10 rounded-xl bg-white border border-[#e8e8e6] flex items-center justify-center hover:border-[#111] transition-all"
+            >
+              <img
+                src="https://cdn.poehali.dev/projects/deb6d332-2cc4-4c3a-bcd1-e4e0a738361b/bucket/3b3c2c42-6a2f-4f5c-a578-28499807f324.png"
+                alt="Открой свою Россию"
+                className="h-5 w-auto"
+              />
+            </a>
             <button
               onClick={() => go("/cabinet")}
               aria-label="Личный кабинет"
