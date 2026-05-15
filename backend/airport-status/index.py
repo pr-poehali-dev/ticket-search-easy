@@ -174,7 +174,7 @@ def db_connect():
 
 def load_overrides():
     """Возвращает (forced_add: dict, forced_remove: set).
-    Для каждого аэропорта берём самую свежую запись."""
+    Игнорируем записи с истёкшим expires_at."""
     conn = db_connect()
     if conn is None:
         return {}, set()
@@ -184,12 +184,13 @@ def load_overrides():
         with conn.cursor() as cur:
             cur.execute("""
                 SELECT DISTINCT ON (airport)
-                  airport, city, action, restricted_at, created_at
+                  airport, city, action, restricted_at, created_at, expires_at
                 FROM airport_overrides
+                WHERE expires_at IS NULL OR expires_at > NOW()
                 ORDER BY airport, created_at DESC
             """)
             for row in cur.fetchall():
-                airport, city, action, restricted_at, created_at = row
+                airport, city, action, restricted_at, created_at, _exp = row
                 if action == "add":
                     iso = (restricted_at or created_at).isoformat()
                     forced_add[airport] = {
@@ -214,7 +215,7 @@ def list_overrides_raw():
     try:
         with conn.cursor() as cur:
             cur.execute("""
-                SELECT id, airport, city, action, restricted_at, note, created_by, created_at
+                SELECT id, airport, city, action, restricted_at, note, created_by, created_at, expires_at
                 FROM airport_overrides
                 ORDER BY created_at DESC
                 LIMIT 200
@@ -229,12 +230,13 @@ def list_overrides_raw():
             "note": r[5] or "",
             "createdBy": r[6] or "",
             "createdAt": r[7].isoformat(),
+            "expiresAt": r[8].isoformat() if r[8] else None,
         } for r in rows]
     finally:
         conn.close()
 
 
-def add_override(airport: str, city: str, action: str, note: str, email: str):
+def add_override(airport: str, city: str, action: str, note: str, email: str, expires_at: str = ""):
     conn = db_connect()
     if conn is None:
         return False
@@ -245,9 +247,14 @@ def add_override(airport: str, city: str, action: str, note: str, email: str):
             action_safe = action.replace("'", "''")
             note_safe = (note or "").replace("'", "''")
             email_safe = (email or "").replace("'", "''")
+            exp_sql = "NULL"
+            if expires_at:
+                # принимаем ISO-строку или 'YYYY-MM-DDTHH:MM'
+                exp_safe = expires_at.replace("'", "''")
+                exp_sql = f"'{exp_safe}'::timestamptz"
             cur.execute(f"""
-                INSERT INTO airport_overrides (airport, city, action, restricted_at, note, created_by)
-                VALUES ('{airport_safe}', '{city_safe}', '{action_safe}', NOW(), '{note_safe}', '{email_safe}')
+                INSERT INTO airport_overrides (airport, city, action, restricted_at, note, created_by, expires_at)
+                VALUES ('{airport_safe}', '{city_safe}', '{action_safe}', NOW(), '{note_safe}', '{email_safe}', {exp_sql})
             """)
         conn.commit()
         return True
@@ -417,11 +424,12 @@ def handler(event: dict, context) -> dict:
             airport = (body.get("airport") or "").strip()
             city = (body.get("city") or "").strip()
             note = (body.get("note") or "").strip()
+            expires_at = (body.get("expiresAt") or "").strip()
             if not airport or not city:
                 return {"statusCode": 400, "headers": CORS_HEADERS,
                         "body": json.dumps({"error": "airport и city обязательны"}),
                         "isBase64Encoded": False}
-            add_override(airport, city, "add", note, admin_email)
+            add_override(airport, city, "add", note, admin_email, expires_at)
             return {"statusCode": 200, "headers": CORS_HEADERS,
                     "body": json.dumps({"ok": True}), "isBase64Encoded": False}
 
@@ -429,11 +437,12 @@ def handler(event: dict, context) -> dict:
             airport = (body.get("airport") or "").strip()
             city = (body.get("city") or "").strip()
             note = (body.get("note") or "").strip()
+            expires_at = (body.get("expiresAt") or "").strip()
             if not airport:
                 return {"statusCode": 400, "headers": CORS_HEADERS,
                         "body": json.dumps({"error": "airport обязателен"}),
                         "isBase64Encoded": False}
-            add_override(airport, city or "", "remove", note, admin_email)
+            add_override(airport, city or "", "remove", note, admin_email, expires_at)
             return {"statusCode": 200, "headers": CORS_HEADERS,
                     "body": json.dumps({"ok": True}), "isBase64Encoded": False}
 

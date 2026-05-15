@@ -19,7 +19,34 @@ type Override = {
   note: string;
   createdBy: string;
   createdAt: string;
+  expiresAt: string | null;
 };
+
+const EXPIRY_PRESETS: { label: string; hours: number | null }[] = [
+  { label: "Без срока", hours: null },
+  { label: "6 часов", hours: 6 },
+  { label: "12 часов", hours: 12 },
+  { label: "Сутки", hours: 24 },
+  { label: "3 дня", hours: 72 },
+];
+
+function hoursToIso(hours: number | null): string {
+  if (!hours) return "";
+  const d = new Date(Date.now() + hours * 3600 * 1000);
+  return d.toISOString();
+}
+
+function formatExpiry(iso: string | null): string {
+  if (!iso) return "";
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return "";
+  return d.toLocaleString("ru-RU", {
+    day: "2-digit",
+    month: "short",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+}
 
 export default function CabinetAirportControl({ email }: { email: string }) {
   const [items, setItems] = useState<AirportItem[]>([]);
@@ -28,6 +55,7 @@ export default function CabinetAirportControl({ email }: { email: string }) {
   const [airport, setAirport] = useState("");
   const [city, setCity] = useState("");
   const [note, setNote] = useState("");
+  const [expiryHours, setExpiryHours] = useState<number | null>(24);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -51,7 +79,13 @@ export default function CabinetAirportControl({ email }: { email: string }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const send = async (op: "add" | "remove", a: string, c: string, n: string) => {
+  const send = async (
+    op: "add" | "remove",
+    a: string,
+    c: string,
+    n: string,
+    expiresAt: string = "",
+  ) => {
     setBusy(true);
     setError(null);
     try {
@@ -61,7 +95,7 @@ export default function CabinetAirportControl({ email }: { email: string }) {
           "Content-Type": "application/json",
           "X-User-Email": email,
         },
-        body: JSON.stringify({ op, airport: a, city: c, note: n }),
+        body: JSON.stringify({ op, airport: a, city: c, note: n, expiresAt }),
       });
       if (!r.ok) {
         const d = await r.json().catch(() => ({}));
@@ -171,9 +205,43 @@ export default function CabinetAirportControl({ email }: { email: string }) {
               placeholder="Комментарий (опционально)"
               className="w-full border border-[#e8e8e6] rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-[#111]"
             />
+            <div>
+              <p className="text-[10px] tracking-[0.2em] uppercase text-[#c0c0bc] font-['IBM_Plex_Mono'] mb-1.5">
+                Срок действия
+              </p>
+              <div className="flex flex-wrap gap-1.5">
+                {EXPIRY_PRESETS.map((p) => (
+                  <button
+                    key={p.label}
+                    type="button"
+                    onClick={() => setExpiryHours(p.hours)}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-all ${
+                      expiryHours === p.hours
+                        ? "bg-[#7B9D52] border-[#7B9D52] text-white"
+                        : "bg-white border-[#e8e8e6] text-[#444] hover:border-[#111]"
+                    }`}
+                  >
+                    {p.label}
+                  </button>
+                ))}
+              </div>
+              {expiryHours && (
+                <p className="text-[11px] text-[#8a8a8a] mt-1.5">
+                  Запись автоматически снимется {formatExpiry(hoursToIso(expiryHours))}
+                </p>
+              )}
+            </div>
             <button
               disabled={busy || !airport.trim() || !city.trim()}
-              onClick={() => send("add", airport.trim(), city.trim(), note.trim())}
+              onClick={() =>
+                send(
+                  "add",
+                  airport.trim(),
+                  city.trim(),
+                  note.trim(),
+                  hoursToIso(expiryHours),
+                )
+              }
               className="w-full bg-[#111] text-white rounded-xl py-2.5 text-sm font-medium hover:bg-[#333] disabled:opacity-50"
             >
               Добавить в бегущую строку
@@ -204,6 +272,11 @@ export default function CabinetAirportControl({ email }: { email: string }) {
                       <span className="text-[#444]">{o.airport}</span>
                       {o.city ? <span className="text-[#8a8a8a]"> · {o.city}</span> : null}
                       {o.note && <span className="text-[#8a8a8a]"> — {o.note}</span>}
+                      {o.expiresAt && (
+                        <span className="text-[#7a5a00] ml-1">
+                          · до {formatExpiry(o.expiresAt)}
+                        </span>
+                      )}
                     </div>
                     <button
                       onClick={() => removeOverride(o.id)}
