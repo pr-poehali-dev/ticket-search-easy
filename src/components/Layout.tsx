@@ -124,19 +124,6 @@ export default function Layout() {
                 <span className="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-[#e53935] rounded-full ring-2 ring-white animate-pulse" />
               )}
             </button>
-            <a
-              href="https://открой-свою-россию.рф"
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="Журнал «Открой свою Россию»"
-              className="flex items-center justify-center hover:opacity-70 transition-opacity"
-            >
-              <img
-                src="https://cdn.poehali.dev/projects/deb6d332-2cc4-4c3a-bcd1-e4e0a738361b/bucket/3b3c2c42-6a2f-4f5c-a578-28499807f324.png"
-                alt="Открой свою Россию"
-                className="h-6 w-auto"
-              />
-            </a>
             <button
               onClick={() => setMobileOpen((v) => !v)}
               aria-label="Открыть меню"
@@ -180,6 +167,21 @@ export default function Layout() {
                   <span>{item.label}</span>
                 </button>
               ))}
+              <div className="pt-2 border-t border-[#e8e8e6] mt-2">
+                <a
+                  href="https://открой-свою-россию.рф"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => setMobileOpen(false)}
+                  className="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-[#f7f7f6] transition-all"
+                >
+                  <img
+                    src="https://cdn.poehali.dev/projects/deb6d332-2cc4-4c3a-bcd1-e4e0a738361b/bucket/3b3c2c42-6a2f-4f5c-a578-28499807f324.png"
+                    alt="Открой свою Россию"
+                    className="h-5 w-auto"
+                  />
+                </a>
+              </div>
             </nav>
           </div>
         </div>
