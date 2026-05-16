@@ -67,7 +67,7 @@ export default function AirportTicker() {
     <div className="px-3 sm:px-6 pt-2 animate-ticker-drop">
       <div className="max-w-6xl mx-auto bg-[#fff3c4] border border-[#f0d97a] text-[#7a5a00] rounded-2xl shadow-sm overflow-hidden">
         <div className="flex items-center gap-3 pr-2">
-          <div className="flex-shrink-0 flex items-center gap-2 pl-4 py-2 bg-[#ffe680] rounded-l-2xl">
+          <div className="flex-shrink-0 flex items-center px-3 py-2 bg-[#ffe680] rounded-l-2xl">
             <Icon name="TriangleAlert" size={14} className="text-[#7a5a00]" />
           </div>
 
