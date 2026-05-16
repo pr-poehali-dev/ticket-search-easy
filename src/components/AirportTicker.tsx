@@ -69,9 +69,6 @@ export default function AirportTicker() {
         <div className="flex items-center gap-3 pr-2">
           <div className="flex-shrink-0 flex items-center gap-2 pl-4 py-2 bg-[#ffe680] rounded-l-2xl">
             <Icon name="TriangleAlert" size={14} className="text-[#7a5a00]" />
-            <span className="text-[11px] font-semibold uppercase tracking-wider font-['IBM_Plex_Mono']">
-              Ограничения
-            </span>
           </div>
 
           <div className="flex-1 overflow-hidden py-2">
