@@ -4,8 +4,6 @@
  * Провайдер: Polza.ai
  */
 
-"use client";
-
 import { useState, useEffect, useRef, FormEvent } from "react";
 import { useChatGPT } from "./useChatGPT";
 

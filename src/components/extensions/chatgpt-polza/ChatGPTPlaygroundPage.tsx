@@ -5,8 +5,6 @@
  * Пример: /chatgpt или /playground
  */
 
-"use client";
-
 import { ChatGPTPlayground } from "./ChatGPTPlayground";
 
 interface ChatGPTPlaygroundPageProps {
