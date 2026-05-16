@@ -270,7 +270,7 @@ export default function Layout() {
           {/* Parent company logo */}
           <div className="pt-8 border-t border-[#e8e8e6] mb-6 flex justify-center md:justify-start">
             <a
-              href="https://t.me/DUBBLE_RF"
+              href="https://vk.com/dabblrus"
               target="_blank"
               rel="noopener noreferrer"
               className="group"
