@@ -49,7 +49,7 @@ export default function Layout() {
   return (
     <div className="min-h-screen flex flex-col">
       {/* Top nav */}
-      <header className="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-[#e8e8e6]">
+      <header className="fixed top-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-md border-b border-[#e8e8e6]">
         <div className="max-w-4xl mx-auto px-6 h-16 flex items-center justify-between">
           <button onClick={() => go("/")} className="flex items-center">
             <img
@@ -139,9 +139,6 @@ export default function Layout() {
         </div>
       </header>
 
-      {/* Airport restrictions ticker */}
-      <AirportTicker />
-
       {/* Mobile menu drawer */}
       {mobileOpen && (
         <div
@@ -188,7 +185,8 @@ export default function Layout() {
       )}
 
       {/* Content */}
-      <main className="flex-1">
+      <main className="flex-1 pt-16">
+        <AirportTicker />
         <Outlet />
       </main>
 
