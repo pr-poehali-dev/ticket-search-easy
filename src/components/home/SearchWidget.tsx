@@ -256,121 +256,71 @@ export default function SearchWidget() {
         </div>
       </section>
 
-      {tab === "flights" && (
-        <section className="px-6 pb-8 max-w-4xl mx-auto">
-          {!widgetReady && (
-            <div className="bg-white border border-[#e8e8e6] rounded-2xl p-8 animate-pulse">
-              <div className="flex items-center gap-3 mb-6">
-                <Icon name="Plane" size={20} className="text-[#c0c0bc]" />
-                <div className="h-3 bg-[#ececea] rounded w-32" />
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
-                <div className="h-12 bg-[#ececea] rounded-xl" />
-                <div className="h-12 bg-[#ececea] rounded-xl" />
-                <div className="h-12 bg-[#ececea] rounded-xl" />
-                <div className="h-12 bg-[#111] rounded-xl opacity-20" />
-              </div>
-              <p className="text-xs text-[#c0c0bc] font-['IBM_Plex_Mono'] mt-5 tracking-wider">
-                ЗАГРУЖАЕМ ПОИСК…
-              </p>
-            </div>
-          )}
-          <div id="tpwl-search" className={widgetReady ? "" : "hidden"}></div>
-        </section>
-      )}
-
-      {tab === "hotels" && (
-        <section className="px-6 pb-8 max-w-6xl mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-[1fr_400px] gap-6 items-start">
-            <div className="relative rounded-2xl overflow-hidden bg-[#ececea] aspect-[16/10] lg:aspect-auto lg:h-full lg:min-h-[420px]">
-              <img
-                src="https://cdn.poehali.dev/projects/deb6d332-2cc4-4c3a-bcd1-e4e0a738361b/bucket/1fe9278f-88ae-41fb-90a6-8dcc7d634c44.png"
-                alt="Карелия"
-                className="absolute inset-0 w-full h-full object-cover"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
-              <div className="absolute bottom-0 left-0 right-0 p-6 sm:p-8">
-                <h3 className="text-white text-2xl sm:text-3xl font-semibold leading-tight">
-                  Захотелось переключиться
-                </h3>
-                <p className="text-white/80 mt-2 text-sm sm:text-base">
-                  Исследуем Ленинградскую область
-                </p>
-                <button className="mt-4 inline-flex items-center gap-2 bg-white text-[#111] px-5 py-2.5 rounded-full text-sm font-medium hover:bg-white/90 transition">
-                  Выбрать отель
-                  <span className="text-[#7B9D52] font-semibold">от 7000 ₽</span>
-                </button>
-              </div>
-            </div>
-
-            <div className="space-y-4">
-              {!hotelsReady && (
-                <div className="bg-white border border-[#e8e8e6] rounded-2xl p-6 animate-pulse">
-                  <div className="flex items-center gap-3 mb-6">
-                    <Icon name="BedDouble" size={20} className="text-[#c0c0bc]" />
-                    <div className="h-3 bg-[#ececea] rounded w-32" />
-                  </div>
-                  <div className="space-y-3">
-                    <div className="h-12 bg-[#ececea] rounded-xl" />
-                    <div className="h-12 bg-[#ececea] rounded-xl" />
-                    <div className="h-12 bg-[#ececea] rounded-xl" />
-                    <div className="h-12 bg-[#111] rounded-xl opacity-20" />
-                  </div>
-                  <p className="text-xs text-[#c0c0bc] font-['IBM_Plex_Mono'] mt-5 tracking-wider">
-                    ЗАГРУЖАЕМ ПОИСК…
-                  </p>
-                </div>
-              )}
-              <div
-                id="hotels-widget"
-                className={hotelsReady ? "" : "hidden"}
-              ></div>
-
-              <div className="bg-white border border-[#e8e8e6] rounded-2xl divide-y divide-[#f0f0ee]">
-                <div className="flex items-center gap-4 px-5 py-4">
-                  <div className="flex-1">
-                    <p className="text-[#111] font-medium text-sm">
-                      Большой выбор отелей
-                    </p>
-                    <p className="text-[#8a8a8a] text-xs mt-0.5">
-                      2 миллиона объектов по всему миру
-                    </p>
-                  </div>
-                  <Icon name="Building2" size={20} className="text-[#c0c0bc]" />
-                </div>
-                <div className="flex items-center gap-4 px-5 py-4">
-                  <div className="flex-1">
-                    <p className="text-[#111] font-medium text-sm">
-                      Оплата российской картой
-                    </p>
-                    <p className="text-[#8a8a8a] text-xs mt-0.5">
-                      Любого зарубежного отеля
-                    </p>
-                  </div>
-                  <Icon name="Wallet" size={20} className="text-[#c0c0bc]" />
-                </div>
-                <div className="flex items-center gap-4 px-5 py-4">
-                  <div className="flex-1">
-                    <p className="text-[#111] font-medium text-sm">
-                      Поддержка 24/7
-                    </p>
-                    <p className="text-[#8a8a8a] text-xs mt-0.5">
-                      В онлайн-чате, по телефону и почте
-                    </p>
-                  </div>
-                  <Icon name="Heart" size={20} className="text-[#c0c0bc]" />
-                </div>
-              </div>
-            </div>
+      <section className="px-6 pb-8 max-w-6xl mx-auto">
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_420px] gap-6 items-start">
+          <div className="space-y-4">
+            <MascotTip />
           </div>
-        </section>
-      )}
 
-      {tab === "flights" && widgetReady && (
-        <section className="px-6 pb-8 max-w-4xl mx-auto animate-slide-up">
-          <MascotTip />
-        </section>
-      )}
+          <div className="space-y-4">
+            {tab === "flights" && (
+              <>
+                {!widgetReady && (
+                  <div className="bg-white border border-[#e8e8e6] rounded-2xl p-6 animate-pulse">
+                    <div className="flex items-center gap-3 mb-6">
+                      <Icon name="Plane" size={20} className="text-[#c0c0bc]" />
+                      <div className="h-3 bg-[#ececea] rounded w-32" />
+                    </div>
+                    <div className="space-y-3">
+                      <div className="h-12 bg-[#ececea] rounded-xl" />
+                      <div className="h-12 bg-[#ececea] rounded-xl" />
+                      <div className="h-12 bg-[#ececea] rounded-xl" />
+                      <div className="h-12 bg-[#111] rounded-xl opacity-20" />
+                    </div>
+                    <p className="text-xs text-[#c0c0bc] font-['IBM_Plex_Mono'] mt-5 tracking-wider">
+                      ЗАГРУЖАЕМ ПОИСК…
+                    </p>
+                  </div>
+                )}
+                <div
+                  id="tpwl-search"
+                  className={widgetReady ? "" : "hidden"}
+                ></div>
+              </>
+            )}
+
+            {tab === "hotels" && (
+              <>
+                {!hotelsReady && (
+                  <div className="bg-white border border-[#e8e8e6] rounded-2xl p-6 animate-pulse">
+                    <div className="flex items-center gap-3 mb-6">
+                      <Icon
+                        name="BedDouble"
+                        size={20}
+                        className="text-[#c0c0bc]"
+                      />
+                      <div className="h-3 bg-[#ececea] rounded w-32" />
+                    </div>
+                    <div className="space-y-3">
+                      <div className="h-12 bg-[#ececea] rounded-xl" />
+                      <div className="h-12 bg-[#ececea] rounded-xl" />
+                      <div className="h-12 bg-[#ececea] rounded-xl" />
+                      <div className="h-12 bg-[#111] rounded-xl opacity-20" />
+                    </div>
+                    <p className="text-xs text-[#c0c0bc] font-['IBM_Plex_Mono'] mt-5 tracking-wider">
+                      ЗАГРУЖАЕМ ПОИСК…
+                    </p>
+                  </div>
+                )}
+                <div
+                  id="hotels-widget"
+                  className={hotelsReady ? "" : "hidden"}
+                ></div>
+              </>
+            )}
+          </div>
+        </div>
+      </section>
 
       {searching && (
         <section className="px-6 pb-6 max-w-4xl mx-auto animate-fade-in">
