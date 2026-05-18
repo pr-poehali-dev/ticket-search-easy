@@ -1,7 +1,6 @@
 import { useCallback, useState } from "react";
 import Icon from "@/components/ui/icon";
-import MascotTip from "@/components/MascotTip";
-import RussiaPlacesCarousel from "@/components/home/RussiaPlacesCarousel";
+import PromoCard from "@/components/home/PromoCard";
 import FlightsPanel from "@/components/home/FlightsPanel";
 import HotelsPanel from "@/components/home/HotelsPanel";
 import SearchingOverlay from "@/components/home/SearchingOverlay";
@@ -58,22 +57,17 @@ export default function SearchWidget() {
 
       <section className="px-6 pb-8 max-w-6xl mx-auto">
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_420px] gap-6 items-start">
-          <div className="hidden lg:block space-y-4">
-            <RussiaPlacesCarousel />
-            <MascotTip />
+          <div className="hidden lg:block">
+            <PromoCard />
           </div>
 
-          <div className="space-y-4 order-1 lg:order-2">
+          <div className="space-y-4">
             <div className={tab === "flights" ? "space-y-4" : "hidden"}>
               <FlightsPanel onSearchingChange={handleSearchingChange} />
             </div>
             <div className={tab === "hotels" ? "space-y-4" : "hidden"}>
               <HotelsPanel />
             </div>
-          </div>
-
-          <div className="block lg:hidden order-2">
-            <MascotTip />
           </div>
         </div>
       </section>
