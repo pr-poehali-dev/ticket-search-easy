@@ -56,8 +56,8 @@ export default function SearchWidget() {
       </section>
 
       <section className="px-6 pb-8 max-w-6xl mx-auto">
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr_420px] gap-6 items-start">
-          <div className="hidden lg:block">
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_420px] gap-6 lg:items-stretch">
+          <div className="hidden lg:flex">
             <PromoCard />
           </div>
 

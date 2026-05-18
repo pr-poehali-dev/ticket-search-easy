@@ -127,7 +127,7 @@ export default function PromoCard() {
   };
 
   return (
-    <div className="relative rounded-2xl overflow-hidden bg-[#1a1f17] aspect-[16/11] shadow-[0_15px_40px_-15px_rgba(0,0,0,0.25)]">
+    <div className="relative rounded-2xl overflow-hidden bg-[#1a1f17] w-full min-h-[420px] lg:min-h-0 lg:h-full shadow-[0_15px_40px_-15px_rgba(0,0,0,0.25)]">
       {/* Фон: фото Россия */}
       {RUSSIA_PLACES.map((p, i) => (
         <img
