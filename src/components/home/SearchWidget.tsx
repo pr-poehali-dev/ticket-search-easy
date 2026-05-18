@@ -58,12 +58,12 @@ export default function SearchWidget() {
 
       <section className="px-6 pb-8 max-w-6xl mx-auto">
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_420px] gap-6 items-start">
-          <div className="space-y-4">
+          <div className="hidden lg:block space-y-4">
             <RussiaPlacesCarousel />
             <MascotTip />
           </div>
 
-          <div className="space-y-4">
+          <div className="space-y-4 order-1 lg:order-2">
             <div className={tab === "flights" ? "space-y-4" : "hidden"}>
               <FlightsPanel onSearchingChange={handleSearchingChange} />
             </div>
@@ -71,12 +71,16 @@ export default function SearchWidget() {
               <HotelsPanel />
             </div>
           </div>
+
+          <div className="block lg:hidden order-2">
+            <MascotTip />
+          </div>
         </div>
       </section>
 
       {searching && <SearchingOverlay />}
 
-      <section className="px-6 pb-16 max-w-4xl mx-auto">
+      <section className="px-6 pb-16 max-w-6xl mx-auto">
         <div id="tpwl-tickets"></div>
       </section>
     </>

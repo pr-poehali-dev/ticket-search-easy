@@ -138,7 +138,7 @@ export default function WeatherTipsSection() {
   return (
     <>
       {/* Weather */}
-      <section className="px-6 pb-12 max-w-4xl mx-auto">
+      <section className="px-6 pb-12 max-w-6xl mx-auto">
         <div className="flex items-end justify-between mb-6">
           <h2 className="text-sm font-medium tracking-[0.15em] uppercase text-[#8a8a8a] font-['IBM_Plex_Mono']">
             Погода в популярных направлениях
@@ -173,7 +173,7 @@ export default function WeatherTipsSection() {
       </section>
 
       {/* Tips */}
-      <section className="px-6 pb-20 max-w-4xl mx-auto">
+      <section className="px-6 pb-20 max-w-6xl mx-auto">
         <h2 className="text-sm font-medium tracking-[0.15em] uppercase text-[#8a8a8a] mb-6 font-['IBM_Plex_Mono']">
           Советы перед поездкой
         </h2>

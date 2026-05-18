@@ -88,7 +88,7 @@ export default function NewsSection() {
   }, []);
 
   return (
-    <section className="px-6 pb-12 max-w-4xl mx-auto">
+    <section className="px-6 pb-12 max-w-6xl mx-auto">
       <div className="flex items-end justify-between mb-6">
         <h2 className="text-sm font-medium tracking-[0.15em] uppercase text-[#8a8a8a] font-['IBM_Plex_Mono']">
           Новости для путешественников

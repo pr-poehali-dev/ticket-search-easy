@@ -13,28 +13,28 @@ const RUSSIA_PLACES = [
     subtitle: "Вулканы, гейзеры и Тихий океан",
     price: "от 18 500 ₽",
     image:
-      "https://images.unsplash.com/photo-1589182337358-2cb63099350c?auto=format&fit=crop&w=1600&q=80",
+      "https://cdn.poehali.dev/projects/deb6d332-2cc4-4c3a-bcd1-e4e0a738361b/files/82195427-9fa4-42a1-ae78-490be6bcf080.jpg",
   },
   {
     title: "Алтай",
     subtitle: "Горные реки и бирюзовые озёра",
     price: "от 9 200 ₽",
     image:
-      "https://images.unsplash.com/photo-1551632811-561732d1e306?auto=format&fit=crop&w=1600&q=80",
+      "https://cdn.poehali.dev/projects/deb6d332-2cc4-4c3a-bcd1-e4e0a738361b/files/0e6dbf50-3100-4377-9c35-e00284ed5662.jpg",
   },
   {
     title: "Байкал",
     subtitle: "Самое глубокое озеро планеты",
     price: "от 12 000 ₽",
     image:
-      "https://images.unsplash.com/photo-1601275299720-79c1f1cbabb9?auto=format&fit=crop&w=1600&q=80",
+      "https://cdn.poehali.dev/projects/deb6d332-2cc4-4c3a-bcd1-e4e0a738361b/files/89de5751-2ccb-4d8e-a187-634acbb29504.jpg",
   },
   {
     title: "Сочи",
     subtitle: "Море, горы и субтропики круглый год",
     price: "от 5 500 ₽",
     image:
-      "https://images.unsplash.com/photo-1601581875309-fafbf2d3ed3a?auto=format&fit=crop&w=1600&q=80",
+      "https://cdn.poehali.dev/projects/deb6d332-2cc4-4c3a-bcd1-e4e0a738361b/files/c2cfbbd8-2765-4554-9ed9-7fcb992d3b15.jpg",
   },
 ];
 
