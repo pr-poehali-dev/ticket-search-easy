@@ -12,6 +12,19 @@ RSS_FEEDS = [
     ("Авиация", "https://tass.ru/transport/rss.xml"),
 ]
 
+STOP_WORDS = [
+    "секс", "эротик", "порно", "рабын", "рабов", "рабыня", "проститут",
+    "бордел", "интим", "стриптиз", "наркотик", "наркот", "наркоман",
+    "казино", "ставк", "букмекер", "гемблинг", "мошенник", "скам",
+    "убийств", "теракт", "взрыв", "катастроф", "крушени",
+]
+
+
+def is_clean(title: str, desc: str) -> bool:
+    text = (title + " " + desc).lower()
+    return not any(w in text for w in STOP_WORDS)
+
+
 ICON_BY_TAG = {
     "Авиация": "Plane",
     "Туризм": "Globe",
@@ -84,6 +97,9 @@ def parse_rss(xml_bytes: bytes, default_tag: str, limit: int = 4):
         link = (link_el.text or "").strip() if link_el is not None else ""
 
         if not title:
+            continue
+
+        if not is_clean(title, desc):
             continue
 
         if len(desc) > 160:
