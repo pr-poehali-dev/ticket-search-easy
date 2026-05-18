@@ -6,7 +6,7 @@ const RUSSIA_PLACES = [
     subtitle: "Сказочные озёра и северные леса",
     price: "от 7 000 ₽",
     image:
-      "https://cdn.poehali.dev/projects/deb6d332-2cc4-4c3a-bcd1-e4e0a738361b/bucket/1fe9278f-88ae-41fb-90a6-8dcc7d634c44.png",
+      "https://cdn.poehali.dev/projects/deb6d332-2cc4-4c3a-bcd1-e4e0a738361b/files/c1ae18fc-a231-45cf-b996-ad86f6e00123.jpg",
   },
   {
     title: "Камчатка",

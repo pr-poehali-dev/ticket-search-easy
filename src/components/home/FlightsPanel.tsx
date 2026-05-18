@@ -2,16 +2,14 @@ import { useEffect, useRef, useState } from "react";
 import Icon from "@/components/ui/icon";
 
 interface Props {
-  active: boolean;
   onSearchingChange: (searching: boolean) => void;
 }
 
-export default function FlightsPanel({ active, onSearchingChange }: Props) {
+export default function FlightsPanel({ onSearchingChange }: Props) {
   const [widgetReady, setWidgetReady] = useState(false);
   const searchingTimer = useRef<number | null>(null);
 
   useEffect(() => {
-    if (!active) return;
     setWidgetReady(false);
 
     document
@@ -176,7 +174,8 @@ export default function FlightsPanel({ active, onSearchingChange }: Props) {
       if (searchingTimer.current) clearTimeout(searchingTimer.current);
       clearTimeout(fallback);
     };
-  }, [active, onSearchingChange]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <>

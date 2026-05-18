@@ -1,15 +1,10 @@
 import { useEffect, useState } from "react";
 import Icon from "@/components/ui/icon";
 
-interface Props {
-  active: boolean;
-}
-
-export default function HotelsPanel({ active }: Props) {
+export default function HotelsPanel() {
   const [hotelsReady, setHotelsReady] = useState(false);
 
   useEffect(() => {
-    if (!active) return;
     setHotelsReady(false);
 
     const container = document.getElementById("hotels-widget");
@@ -43,7 +38,7 @@ export default function HotelsPanel({ active }: Props) {
       observer?.disconnect();
       clearTimeout(fallback);
     };
-  }, [active]);
+  }, []);
 
   return (
     <>

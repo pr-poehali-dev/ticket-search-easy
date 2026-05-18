@@ -64,14 +64,12 @@ export default function SearchWidget() {
           </div>
 
           <div className="space-y-4">
-            {tab === "flights" && (
-              <FlightsPanel
-                active={tab === "flights"}
-                onSearchingChange={handleSearchingChange}
-              />
-            )}
-
-            {tab === "hotels" && <HotelsPanel active={tab === "hotels"} />}
+            <div className={tab === "flights" ? "space-y-4" : "hidden"}>
+              <FlightsPanel onSearchingChange={handleSearchingChange} />
+            </div>
+            <div className={tab === "hotels" ? "space-y-4" : "hidden"}>
+              <HotelsPanel />
+            </div>
           </div>
         </div>
       </section>
