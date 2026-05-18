@@ -216,27 +216,14 @@ export default function SearchWidget() {
 
   return (
     <>
-      <section className="px-6 pt-20 pb-10 max-w-4xl mx-auto animate-slide-up">
-        <h1 className="text-5xl font-semibold text-[#111] leading-tight mb-2">
-          {tab === "flights"
-            ? "Летите туда, куда хотите!"
-            : "Найдём отель в любой точке мира"}
-        </h1>
-        <p className="text-[#8a8a8a] mt-4 text-lg">
-          {tab === "flights"
-            ? "Сравниваем цены сотен авиакомпаний — мгновенно."
-            : "Сравниваем цены сотен сайтов бронирования — экономьте до 60%."}
-        </p>
-      </section>
-
-      <section className="px-6 pb-4 max-w-4xl mx-auto">
-        <div className="inline-flex bg-white border border-[#e8e8e6] rounded-2xl p-1 shadow-sm">
+      <section className="px-6 pt-16 pb-6 max-w-6xl mx-auto animate-slide-up">
+        <div className="flex items-center justify-center gap-2 mb-6">
           <button
             onClick={() => setTab("flights")}
-            className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium transition-all ${
+            className={`flex items-center gap-2 px-6 py-3 rounded-full text-sm font-medium transition-all ${
               tab === "flights"
-                ? "bg-[#111] text-white shadow-sm"
-                : "text-[#8a8a8a] hover:text-[#111]"
+                ? "bg-[#111] text-white shadow-md"
+                : "bg-white text-[#8a8a8a] border border-[#e8e8e6] hover:text-[#111]"
             }`}
           >
             <Icon name="Plane" size={16} />
@@ -244,21 +231,64 @@ export default function SearchWidget() {
           </button>
           <button
             onClick={() => setTab("hotels")}
-            className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium transition-all ${
+            className={`flex items-center gap-2 px-6 py-3 rounded-full text-sm font-medium transition-all ${
               tab === "hotels"
-                ? "bg-[#111] text-white shadow-sm"
-                : "text-[#8a8a8a] hover:text-[#111]"
+                ? "bg-[#111] text-white shadow-md"
+                : "bg-white text-[#8a8a8a] border border-[#e8e8e6] hover:text-[#111]"
             }`}
           >
             <Icon name="BedDouble" size={16} />
             Отели
           </button>
         </div>
+
+        <h1 className="text-4xl sm:text-5xl font-semibold text-[#111] leading-tight text-center mb-3">
+          {tab === "flights"
+            ? "Летите туда, куда хотите!"
+            : "Найдём отель в любой точке мира"}
+        </h1>
+        <p className="text-[#8a8a8a] text-lg text-center">
+          {tab === "flights"
+            ? "Сравниваем цены сотен авиакомпаний — мгновенно."
+            : "Сравниваем цены сотен сайтов бронирования — экономьте до 60%."}
+        </p>
       </section>
 
       <section className="px-6 pb-8 max-w-6xl mx-auto">
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_420px] gap-6 items-start">
           <div className="space-y-4">
+            <div className="relative rounded-2xl overflow-hidden bg-[#ececea] aspect-[16/11]">
+              <img
+                src="https://cdn.poehali.dev/projects/deb6d332-2cc4-4c3a-bcd1-e4e0a738361b/bucket/1fe9278f-88ae-41fb-90a6-8dcc7d634c44.png"
+                alt={tab === "flights" ? "Путешествие" : "Карелия"}
+                className="absolute inset-0 w-full h-full object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-black/15 to-transparent" />
+              <div className="absolute bottom-0 left-0 right-0 p-6 sm:p-8">
+                <h3 className="text-white text-2xl sm:text-3xl font-semibold leading-tight">
+                  {tab === "flights"
+                    ? "Откройте новые направления"
+                    : "Захотелось переключиться"}
+                </h3>
+                <p className="text-white/85 mt-2 text-sm sm:text-base">
+                  {tab === "flights"
+                    ? "Сотни авиакомпаний — одно окно поиска"
+                    : "Исследуем Ленинградскую область"}
+                </p>
+                <button className="mt-4 inline-flex items-center gap-2 bg-white text-[#111] px-5 py-2.5 rounded-full text-sm font-medium hover:bg-white/90 transition shadow-lg">
+                  {tab === "flights" ? "Выбрать билет" : "Выбрать отель"}
+                  <span className="text-[#7B9D52] font-semibold">
+                    {tab === "flights" ? "от 3500 ₽" : "от 7000 ₽"}
+                  </span>
+                </button>
+              </div>
+              <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-white" />
+                <span className="w-1.5 h-1.5 rounded-full bg-white/40" />
+                <span className="w-1.5 h-1.5 rounded-full bg-white/40" />
+              </div>
+            </div>
+
             <MascotTip />
           </div>
 
@@ -286,6 +316,42 @@ export default function SearchWidget() {
                   id="tpwl-search"
                   className={widgetReady ? "" : "hidden"}
                 ></div>
+
+                <div className="bg-white border border-[#e8e8e6] rounded-2xl divide-y divide-[#f0f0ee]">
+                  <div className="flex items-center gap-4 px-5 py-4">
+                    <div className="flex-1">
+                      <p className="text-[#111] font-medium text-sm">
+                        Сотни авиакомпаний
+                      </p>
+                      <p className="text-[#8a8a8a] text-xs mt-0.5">
+                        Сравниваем цены за секунды
+                      </p>
+                    </div>
+                    <Icon name="Plane" size={20} className="text-[#c0c0bc]" />
+                  </div>
+                  <div className="flex items-center gap-4 px-5 py-4">
+                    <div className="flex-1">
+                      <p className="text-[#111] font-medium text-sm">
+                        Оплата российской картой
+                      </p>
+                      <p className="text-[#8a8a8a] text-xs mt-0.5">
+                        Любого зарубежного рейса
+                      </p>
+                    </div>
+                    <Icon name="Wallet" size={20} className="text-[#c0c0bc]" />
+                  </div>
+                  <div className="flex items-center gap-4 px-5 py-4">
+                    <div className="flex-1">
+                      <p className="text-[#111] font-medium text-sm">
+                        Поддержка 24/7
+                      </p>
+                      <p className="text-[#8a8a8a] text-xs mt-0.5">
+                        В онлайн-чате, по телефону и почте
+                      </p>
+                    </div>
+                    <Icon name="Heart" size={20} className="text-[#c0c0bc]" />
+                  </div>
+                </div>
               </>
             )}
 
@@ -316,6 +382,46 @@ export default function SearchWidget() {
                   id="hotels-widget"
                   className={hotelsReady ? "" : "hidden"}
                 ></div>
+
+                <div className="bg-white border border-[#e8e8e6] rounded-2xl divide-y divide-[#f0f0ee]">
+                  <div className="flex items-center gap-4 px-5 py-4">
+                    <div className="flex-1">
+                      <p className="text-[#111] font-medium text-sm">
+                        Большой выбор отелей
+                      </p>
+                      <p className="text-[#8a8a8a] text-xs mt-0.5">
+                        2 миллиона объектов по всему миру
+                      </p>
+                    </div>
+                    <Icon
+                      name="Building2"
+                      size={20}
+                      className="text-[#c0c0bc]"
+                    />
+                  </div>
+                  <div className="flex items-center gap-4 px-5 py-4">
+                    <div className="flex-1">
+                      <p className="text-[#111] font-medium text-sm">
+                        Оплата российской картой
+                      </p>
+                      <p className="text-[#8a8a8a] text-xs mt-0.5">
+                        Любого зарубежного отеля
+                      </p>
+                    </div>
+                    <Icon name="Wallet" size={20} className="text-[#c0c0bc]" />
+                  </div>
+                  <div className="flex items-center gap-4 px-5 py-4">
+                    <div className="flex-1">
+                      <p className="text-[#111] font-medium text-sm">
+                        Поддержка 24/7
+                      </p>
+                      <p className="text-[#8a8a8a] text-xs mt-0.5">
+                        В онлайн-чате, по телефону и почте
+                      </p>
+                    </div>
+                    <Icon name="Heart" size={20} className="text-[#c0c0bc]" />
+                  </div>
+                </div>
               </>
             )}
           </div>
