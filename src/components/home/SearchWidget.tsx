@@ -2,12 +2,54 @@ import { useEffect, useRef, useState } from "react";
 import Icon from "@/components/ui/icon";
 import MascotTip from "@/components/MascotTip";
 
+type Tab = "flights" | "hotels";
+
 export default function SearchWidget() {
+  const [tab, setTab] = useState<Tab>("flights");
   const [widgetReady, setWidgetReady] = useState(false);
+  const [hotelsReady, setHotelsReady] = useState(false);
   const [searching, setSearching] = useState(false);
   const searchingTimer = useRef<number | null>(null);
 
   useEffect(() => {
+    if (tab !== "hotels") return;
+    setHotelsReady(false);
+
+    const container = document.getElementById("hotels-widget");
+    if (container) container.innerHTML = "";
+
+    document
+      .querySelectorAll('script[data-hotels-widget="1"]')
+      .forEach((el) => el.remove());
+
+    const script = document.createElement("script");
+    script.src =
+      "https://tpemd.com/content?trs=527526&shmarker=727110&theme=light&powered_by=false&campaign_id=193&promo_id=8581";
+    script.async = true;
+    script.charset = "utf-8";
+    script.setAttribute("data-hotels-widget", "1");
+    if (container) container.appendChild(script);
+
+    let observer: MutationObserver | null = null;
+    if (container) {
+      observer = new MutationObserver(() => {
+        if (container.children.length > 1) {
+          setHotelsReady(true);
+          observer?.disconnect();
+        }
+      });
+      observer.observe(container, { childList: true, subtree: true });
+    }
+    const fallback = setTimeout(() => setHotelsReady(true), 8000);
+
+    return () => {
+      observer?.disconnect();
+      clearTimeout(fallback);
+    };
+  }, [tab]);
+
+  useEffect(() => {
+    if (tab !== "flights") return;
     setWidgetReady(false);
 
     document
@@ -170,39 +212,97 @@ export default function SearchWidget() {
       if (searchingTimer.current) clearTimeout(searchingTimer.current);
       clearTimeout(fallback);
     };
-  }, []);
+  }, [tab]);
 
   return (
     <>
       <section className="px-6 pt-20 pb-10 max-w-4xl mx-auto animate-slide-up">
-        <h1 className="text-5xl font-semibold text-[#111] leading-tight mb-2">Летите туда, куда хотите!</h1>
+        <h1 className="text-5xl font-semibold text-[#111] leading-tight mb-2">
+          {tab === "flights"
+            ? "Летите туда, куда хотите!"
+            : "Найдём отель в любой точке мира"}
+        </h1>
         <p className="text-[#8a8a8a] mt-4 text-lg">
-          Сравниваем цены сотен авиакомпаний — мгновенно.
+          {tab === "flights"
+            ? "Сравниваем цены сотен авиакомпаний — мгновенно."
+            : "Сравниваем цены сотен сайтов бронирования — экономьте до 60%."}
         </p>
       </section>
 
-      <section className="px-6 pb-8 max-w-4xl mx-auto">
-        {!widgetReady && (
-          <div className="bg-white border border-[#e8e8e6] rounded-2xl p-8 animate-pulse">
-            <div className="flex items-center gap-3 mb-6">
-              <Icon name="Plane" size={20} className="text-[#c0c0bc]" />
-              <div className="h-3 bg-[#ececea] rounded w-32" />
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
-              <div className="h-12 bg-[#ececea] rounded-xl" />
-              <div className="h-12 bg-[#ececea] rounded-xl" />
-              <div className="h-12 bg-[#ececea] rounded-xl" />
-              <div className="h-12 bg-[#111] rounded-xl opacity-20" />
-            </div>
-            <p className="text-xs text-[#c0c0bc] font-['IBM_Plex_Mono'] mt-5 tracking-wider">
-              ЗАГРУЖАЕМ ПОИСК…
-            </p>
-          </div>
-        )}
-        <div id="tpwl-search" className={widgetReady ? "" : "hidden"}></div>
+      <section className="px-6 pb-4 max-w-4xl mx-auto">
+        <div className="inline-flex bg-white border border-[#e8e8e6] rounded-2xl p-1 shadow-sm">
+          <button
+            onClick={() => setTab("flights")}
+            className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium transition-all ${
+              tab === "flights"
+                ? "bg-[#111] text-white shadow-sm"
+                : "text-[#8a8a8a] hover:text-[#111]"
+            }`}
+          >
+            <Icon name="Plane" size={16} />
+            Авиабилеты
+          </button>
+          <button
+            onClick={() => setTab("hotels")}
+            className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium transition-all ${
+              tab === "hotels"
+                ? "bg-[#111] text-white shadow-sm"
+                : "text-[#8a8a8a] hover:text-[#111]"
+            }`}
+          >
+            <Icon name="BedDouble" size={16} />
+            Отели
+          </button>
+        </div>
       </section>
 
-      {widgetReady && (
+      {tab === "flights" && (
+        <section className="px-6 pb-8 max-w-4xl mx-auto">
+          {!widgetReady && (
+            <div className="bg-white border border-[#e8e8e6] rounded-2xl p-8 animate-pulse">
+              <div className="flex items-center gap-3 mb-6">
+                <Icon name="Plane" size={20} className="text-[#c0c0bc]" />
+                <div className="h-3 bg-[#ececea] rounded w-32" />
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
+                <div className="h-12 bg-[#ececea] rounded-xl" />
+                <div className="h-12 bg-[#ececea] rounded-xl" />
+                <div className="h-12 bg-[#ececea] rounded-xl" />
+                <div className="h-12 bg-[#111] rounded-xl opacity-20" />
+              </div>
+              <p className="text-xs text-[#c0c0bc] font-['IBM_Plex_Mono'] mt-5 tracking-wider">
+                ЗАГРУЖАЕМ ПОИСК…
+              </p>
+            </div>
+          )}
+          <div id="tpwl-search" className={widgetReady ? "" : "hidden"}></div>
+        </section>
+      )}
+
+      {tab === "hotels" && (
+        <section className="px-6 pb-8 max-w-4xl mx-auto">
+          {!hotelsReady && (
+            <div className="bg-white border border-[#e8e8e6] rounded-2xl p-8 animate-pulse">
+              <div className="flex items-center gap-3 mb-6">
+                <Icon name="BedDouble" size={20} className="text-[#c0c0bc]" />
+                <div className="h-3 bg-[#ececea] rounded w-32" />
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
+                <div className="h-12 bg-[#ececea] rounded-xl" />
+                <div className="h-12 bg-[#ececea] rounded-xl" />
+                <div className="h-12 bg-[#ececea] rounded-xl" />
+                <div className="h-12 bg-[#111] rounded-xl opacity-20" />
+              </div>
+              <p className="text-xs text-[#c0c0bc] font-['IBM_Plex_Mono'] mt-5 tracking-wider">
+                ЗАГРУЖАЕМ ПОИСК…
+              </p>
+            </div>
+          )}
+          <div id="hotels-widget" className={hotelsReady ? "" : "hidden"}></div>
+        </section>
+      )}
+
+      {tab === "flights" && widgetReady && (
         <section className="px-6 pb-8 max-w-4xl mx-auto animate-slide-up">
           <MascotTip />
         </section>
