@@ -92,20 +92,6 @@ export default function Layout() {
                 <span className="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-[#e53935] rounded-full ring-2 ring-white animate-pulse" />
               )}
             </button>
-            <a
-              href="https://открой-свою-россию.рф"
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="Журнал «Открой свою Россию»"
-              title="Журнал «Открой свою Россию»"
-              className="ml-4 flex items-center justify-center hover:opacity-70 transition-opacity"
-            >
-              <img
-                src="https://cdn.poehali.dev/projects/deb6d332-2cc4-4c3a-bcd1-e4e0a738361b/bucket/3b3c2c42-6a2f-4f5c-a578-28499807f324.png"
-                alt="Открой свою Россию"
-                className="h-6 w-auto"
-              />
-            </a>
           </nav>
 
           {/* Mobile icons */}
