@@ -3,9 +3,10 @@ import Icon from "@/components/ui/icon";
 import PromoCard from "@/components/home/PromoCard";
 import FlightsPanel from "@/components/home/FlightsPanel";
 import HotelsPanel from "@/components/home/HotelsPanel";
+import ToursPanel from "@/components/home/ToursPanel";
 import SearchingOverlay from "@/components/home/SearchingOverlay";
 
-type Tab = "flights" | "hotels";
+type Tab = "flights" | "hotels" | "tours";
 
 export default function SearchWidget() {
   const [tab, setTab] = useState<Tab>("flights");
@@ -41,17 +42,32 @@ export default function SearchWidget() {
             <Icon name="BedDouble" size={16} />
             Отели
           </button>
+          <button
+            onClick={() => setTab("tours")}
+            className={`flex items-center gap-2 px-6 py-3 rounded-full text-sm font-medium transition-all ${
+              tab === "tours"
+                ? "bg-[#111] text-white shadow-md"
+                : "bg-white text-[#8a8a8a] border border-[#e8e8e6] hover:text-[#111]"
+            }`}
+          >
+            <Icon name="Map" size={16} />
+            Туры
+          </button>
         </div>
 
         <h1 className="text-4xl sm:text-5xl font-semibold text-[#111] leading-tight text-center mb-3">
           {tab === "flights"
             ? "Летите туда, куда хотите!"
-            : "Найдём отель в любой точке мира"}
+            : tab === "hotels"
+              ? "Найдём отель в любой точке мира"
+              : "Готовые туры по России и миру"}
         </h1>
         <p className="text-[#8a8a8a] text-lg text-center">
           {tab === "flights"
             ? "Сравниваем цены сотен авиакомпаний — мгновенно."
-            : "Сравниваем цены сотен сайтов бронирования — экономьте до 60%."}
+            : tab === "hotels"
+              ? "Сравниваем цены сотен сайтов бронирования — экономьте до 60%."
+              : "Отдых, экскурсии и приключения с вылетом из вашего города."}
         </p>
       </section>
 
@@ -67,6 +83,9 @@ export default function SearchWidget() {
             </div>
             <div className={tab === "hotels" ? "space-y-4" : "hidden"}>
               <HotelsPanel />
+            </div>
+            <div className={tab === "tours" ? "space-y-4" : "hidden"}>
+              <ToursPanel />
             </div>
           </div>
         </div>
