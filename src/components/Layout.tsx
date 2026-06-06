@@ -7,6 +7,7 @@ import { useUnreadTickets } from "@/hooks/useUnreadTickets";
 
 const navItems = [
   { path: "/", label: "Поиск", icon: "Search" },
+  { path: "/tury", label: "Туры", icon: "Map" },
   { path: "/sovety", label: "Советы", icon: "Compass" },
   { path: "/cabinet", label: "Кабинет", icon: "User" },
   { path: "/faq", label: "Помощь", icon: "HelpCircle" },

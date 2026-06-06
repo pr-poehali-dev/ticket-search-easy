@@ -7,6 +7,7 @@ import Layout from "@/components/Layout";
 import Home from "./pages/Home";
 import Cabinet from "./pages/Cabinet";
 import Sovety from "./pages/Sovety";
+import Tury from "./pages/Tury";
 import FAQ from "./pages/FAQ";
 import Contacts from "./pages/Contacts";
 import Terms from "./pages/Terms";
@@ -26,6 +27,7 @@ const App = () => (
             <Route path="/" element={<Home />} />
             <Route path="/cabinet" element={<Cabinet />} />
             <Route path="/sovety" element={<Sovety />} />
+            <Route path="/tury" element={<Tury />} />
             <Route path="/faq" element={<FAQ />} />
             <Route path="/contacts" element={<Contacts />} />
             <Route path="/terms" element={<Terms />} />
